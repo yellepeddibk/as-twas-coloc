@@ -1,0 +1,114 @@
+# ============================================================
+# Pipeline configuration for:
+# Towards Coloc-Confirmed TWAS of Ankylosing Spondylitis
+# ============================================================
+
+project:
+  name: "as-twas-coloc"
+  disease: "Ankylosing Spondylitis"
+  gwas_trait: "AS"
+  genome_build: "hg38"  # target build; harmonization lifts hg19 -> hg38 if needed
+
+# ── Paths ────────────────────────────────────────────────────
+paths:
+  data_raw:        "data/raw"
+  data_interim:    "data/interim"
+  data_processed:  "data/processed"
+  data_reference:  "data/reference"
+  results_twas:    "results/twas"
+  results_coloc:   "results/coloc"
+  results_tables:  "results/tables"
+  results_figures: "results/figures"
+  results_manifests: "results/manifests"
+
+  # Output file names (relative to the above dirs)
+  gwas_harmonized: "gwas_harmonized/as_gwas_hg38_varid.tsv.gz"
+  twas_hits:       "twas_hits/twas_hits_fdr05.tsv.gz"
+  coloc_summary:   "coloc_results/coloc_summary.tsv.gz"
+
+# ── GWAS input ───────────────────────────────────────────────
+gwas:
+  # TODO: replace with real file path once GWAS summary stats are available
+  # Recommended source: IGAS / IMSGC / GWAS Catalog for AS
+  input_file: "data/raw/as_gwas.tsv.gz"  # placeholder
+  source_build: "hg19"  # most published AS GWAS are hg19
+  n_total: 10619          # placeholder (cases + controls from largest AS GWAS)
+  n_cases: 4925           # placeholder
+  n_controls: 5694        # placeholder
+  case_fraction: 0.4636   # n_cases / n_total — used by coloc
+
+  # Harmonization options
+  drop_palindromic_snps: true   # drop AT/CG SNPs without AF info
+  af_disambiguation_available: false  # set true if allele-freq data are available
+
+# ── GTEx / PrediXcan resources ───────────────────────────────
+gtex:
+  # TODO: download PredictDB models from predictdb.org
+  # Models are stored as .db (SQLite) files, one per tissue
+  model_dir: "data/reference/gtex_v8_models"  # placeholder
+  # TODO: download GTEx v8 eQTL summary stats for coloc regional data
+  eqtl_dir:  "data/reference/gtex_v8_eqtl"    # placeholder
+  tissues:
+    # Immune / musculoskeletal tissues most relevant to AS
+    - "Whole_Blood"
+    - "Adipose_Subcutaneous"
+    - "Muscle_Skeletal"
+    - "Colon_Sigmoid"
+    - "Colon_Transverse"
+    - "Small_Intestine_Terminal_Ileum"
+    - "Spleen"
+    - "Lung"
+    # Add more GTEx v8 tissues as needed
+
+# ── S-PrediXcan / MetaXcan ───────────────────────────────────
+spredixcan:
+  # TODO: clone https://github.com/hakyimlab/MetaXcan and point executable here
+  script: "external/MetaXcan/software/SPrediXcan.py"  # placeholder
+  model_db_pattern: "{model_dir}/gtex_v8_mashr_{tissue}.db"
+  covariance_pattern: "{model_dir}/gtex_v8_mashr_{tissue}.txt.gz"
+  gwas_file: "data/interim/gwas_harmonized/as_gwas_hg38_varid.tsv.gz"
+  output_dir: "results/twas"
+  # Column name mappings for harmonized GWAS -> SPrediXcan
+  snp_column: "varID"
+  effect_allele_column: "effect_allele"
+  non_effect_allele_column: "non_effect_allele"
+  beta_column: "beta"
+  se_column: "se"
+  pvalue_column: "pvalue"
+
+# ── Multiple-testing correction ──────────────────────────────
+correction:
+  method: "fdr_bh"   # Benjamini-Hochberg across all gene-tissue pairs
+  alpha: 0.05        # FDR threshold
+
+# ── COLOC ────────────────────────────────────────────────────
+coloc:
+  # Priors (standard ABF defaults; Giambartolomei et al. 2014)
+  p1: 1.0e-4   # prior prob. a SNP is associated with trait 1 (GWAS)
+  p2: 1.0e-4   # prior prob. a SNP is associated with trait 2 (eQTL)
+  p12: 1.0e-5  # prior prob. a SNP is associated with both
+
+  # Locus window around gene TSS (bp)
+  window_bp: 1000000  # ±1 Mb
+
+  # Prioritization thresholds
+  pp4_threshold: 0.7          # primary coloc hit
+  pp3_pp4_threshold: 0.8      # powered locus
+  pp4_ratio_threshold: 0.9    # strong shared-signal preference
+
+  # R wrapper
+  # TODO: install R + coloc package: install.packages("coloc")
+  r_script: "src/external_tools/run_coloc.R"  # generated wrapper
+  coloc_susie_available: false  # set true after installing coloc.susie
+
+  output_dir: "results/coloc"
+
+# ── Visualization ────────────────────────────────────────────
+visualization:
+  dpi: 150
+  figure_format: "png"
+
+# ── Provenance ───────────────────────────────────────────────
+provenance:
+  manifest_dir: "results/manifests"
+  record_checksums: true  # placeholder; actual md5 computation enabled
