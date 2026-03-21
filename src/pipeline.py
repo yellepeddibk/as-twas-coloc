@@ -63,6 +63,7 @@ from src.provenance import build_manifest, save_manifest
 from src.logging_utils import get_logger
 from src.external_tools.spredixcan_wrapper import build_spredixcan_command, run_spredixcan
 from src.external_tools.coloc_r_wrapper import run_coloc_abf
+from src.validation import check_gtex_model_varid_overlap
 
 logger = get_logger(__name__)
 
@@ -93,6 +94,7 @@ def run_pipeline(
     """
     base_dir = Path(base_dir).resolve()
     cfg = load_config(config_path)
+    cfg["_base_dir"] = str(base_dir)
     paths = cfg.get("paths", {})
 
     # ── Create output directories ─────────────────────────────
@@ -111,23 +113,47 @@ def run_pipeline(
 
     # ── Stage 1: Load raw GWAS ────────────────────────────────
     logger.info("Stage 1: Load raw GWAS")
-    gwas_input = base_dir / paths.get("data_raw", "data/raw") / cfg["gwas"]["input_file"].split("/")[-1]
+    gwas_input = _resolve_gwas_input_path(base_dir, cfg)
 
-    if mock or not gwas_input.exists():
-        logger.info("[MOCK] Generating synthetic GWAS data.")
-        raw_gwas = _make_mock_gwas_df(cfg)
+    if mock:
+        if not gwas_input.exists():
+            logger.info("[MOCK] GWAS input not found; generating synthetic GWAS data.")
+            raw_gwas = _make_mock_gwas_df(cfg)
+        else:
+            raw_gwas = read_gwas(gwas_input)
     else:
+        if not gwas_input.exists():
+            raise FileNotFoundError(
+                f"Real-mode GWAS input not found: {gwas_input}. "
+                "Provide a real summary statistics file or run with --mock."
+            )
         raw_gwas = read_gwas(gwas_input)
 
     # ── Stage 2: Harmonize GWAS ───────────────────────────────
     logger.info("Stage 2: Harmonize GWAS")
-    harmonized_gwas = harmonize_gwas(raw_gwas, cfg)
+    harmonized_gwas = harmonize_gwas(raw_gwas, cfg, strict_real_mode=not mock)
 
     # ── Stage 3: Save harmonized GWAS ─────────────────────────
     logger.info("Stage 3: Save harmonized GWAS")
     harm_dir = base_dir / paths.get("data_interim", "data/interim") / "gwas_harmonized"
     harm_path = harm_dir / "as_gwas_hg38_varid.tsv.gz"
     write_tsv_gz(harmonized_gwas, harm_path)
+
+    # ── Stage 3b: Save harmonization QC summary ──────────────
+    qc_dir = base_dir / paths.get("data_processed", "data/processed") / "qc"
+    ensure_dir(qc_dir)
+    qc_summary = _build_harmonization_qc(harmonized_gwas)
+    qc_path = qc_dir / "gwas_harmonization_qc.tsv"
+    pd.DataFrame([qc_summary]).to_csv(qc_path, sep="\t", index=False)
+    logger.info("Saved GWAS harmonization QC summary to %s", qc_path)
+
+    # ── Stage 3c: GTEx overlap sanity check ──────────────────
+    overlap = _run_gtex_overlap_check(harmonized_gwas, cfg, mock=mock)
+    if overlap is not None:
+        overlap_tissue = overlap.get("tissue", "unknown_tissue")
+        overlap_out = qc_dir / f"gwas_gtex_overlap_{overlap_tissue}.tsv"
+        pd.DataFrame([overlap]).to_csv(overlap_out, sep="\t", index=False)
+        logger.info("Saved GTEx overlap sanity check to %s", overlap_out)
 
     # ── Stage 4: Run S-PrediXcan ──────────────────────────────
     logger.info("Stage 4: S-PrediXcan (mock=%s)", mock)
@@ -173,12 +199,11 @@ def run_pipeline(
     if mock:
         _run_mock_coloc(twas_hits, cfg, coloc_out_dir)
     else:
-        logger.warning(
-            "Real COLOC requires eQTL regional data files and R + coloc package.  "
-            "Falling back to mock COLOC because real eQTL data not found.  "
-            "TODO: implement real COLOC locus extraction from GTEx eQTL summary stats."
+        raise RuntimeError(
+            "Real-mode COLOC path is not fully wired yet. "
+            "No mock fallback is allowed in real mode. "
+            "Complete eQTL regional extraction + coloc wiring before running --no-mock end-to-end."
         )
-        _run_mock_coloc(twas_hits, cfg, coloc_out_dir)
 
     # ── Stage 11-12: Rank and output genes ────────────────────
     logger.info("Stages 11-12: Aggregate and rank coloc results")
@@ -292,7 +317,14 @@ def _generate_plots(
     viz_cfg = cfg.get("visualization", {})
     dpi = viz_cfg.get("dpi", 150)
 
-    # Use mock data for plots if real outputs are empty
+    # In real mode we fail fast if required results are missing instead of plotting mock data.
+    if not mock and (twas_df.empty or coloc_df.empty):
+        raise RuntimeError(
+            "Real-mode plotting requires non-empty TWAS and COLOC tables. "
+            "Mock fallback plotting is disabled in real mode."
+        )
+
+    # Use mock data for plots in demo mode if outputs are empty
     plot_twas = twas_df if not twas_df.empty else make_mock_twas_df()
     plot_coloc = coloc_df if not coloc_df.empty else make_mock_coloc_df()
 
@@ -321,3 +353,59 @@ def _generate_plots(
 def _norm_cdf_arr(x):
     from scipy.special import ndtr
     return ndtr(x)
+
+
+def _resolve_gwas_input_path(base_dir: Path, cfg: Dict[str, Any]) -> Path:
+    """Resolve GWAS input file path from config, supporting absolute or relative paths."""
+    raw_path = Path(cfg.get("gwas", {}).get("input_file", "data/raw/as_gwas.tsv.gz"))
+    if raw_path.is_absolute():
+        return raw_path
+    return (base_dir / raw_path).resolve()
+
+
+def _build_harmonization_qc(harmonized_gwas: pd.DataFrame) -> Dict[str, Any]:
+    """Return harmonization QC metrics expected for first real-data milestone."""
+    attrs_qc = harmonized_gwas.attrs.get("harmonization_qc", {})
+    return {
+        "input_snp_count": int(attrs_qc.get("input_snp_count", len(harmonized_gwas))),
+        "lifted_snp_count": int(attrs_qc.get("lifted_snp_count", len(harmonized_gwas))),
+        "failed_liftover_count": int(attrs_qc.get("failed_liftover_count", 0)),
+        "palindromic_dropped_count": int(attrs_qc.get("palindromic_dropped_count", 0)),
+        "final_retained_snp_count": int(attrs_qc.get("final_retained_snp_count", len(harmonized_gwas))),
+    }
+
+
+def _run_gtex_overlap_check(
+    harmonized_gwas: pd.DataFrame,
+    cfg: Dict[str, Any],
+    mock: bool,
+) -> Optional[Dict[str, Any]]:
+    """Run overlap sanity check against one GTEx model namespace."""
+    gtex_cfg = cfg.get("gtex", {})
+    sp_cfg = cfg.get("spredixcan", {})
+    validation_cfg = cfg.get("validation", {})
+
+    tissue = validation_cfg.get("gtex_overlap_tissue", "Whole_Blood")
+    min_fraction = float(validation_cfg.get("gtex_overlap_min_fraction", 0.0))
+
+    model_dir = Path(gtex_cfg.get("model_dir", "data/reference/gtex_v8_models"))
+    if not model_dir.is_absolute():
+        model_dir = Path(cfg.get("_base_dir", ".")) / model_dir
+
+    pattern = sp_cfg.get("model_db_pattern", "{model_dir}/gtex_v8_mashr_{tissue}.db")
+    model_path = Path(pattern.format(model_dir=model_dir, tissue=tissue))
+
+    if not model_path.exists():
+        if mock:
+            logger.warning("Skipping GTEx overlap check in mock mode; model DB missing: %s", model_path)
+            return None
+        raise FileNotFoundError(
+            f"GTEx overlap check requires model DB for {tissue}: {model_path}"
+        )
+
+    overlap = check_gtex_model_varid_overlap(harmonized_gwas, model_path, tissue=tissue)
+    if not mock and overlap["overlap_fraction"] < min_fraction:
+        raise RuntimeError(
+            f"GTEx overlap fraction {overlap['overlap_fraction']:.6f} is below configured minimum {min_fraction:.6f}"
+        )
+    return overlap

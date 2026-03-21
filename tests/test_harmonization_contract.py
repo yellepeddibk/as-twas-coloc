@@ -61,6 +61,9 @@ def make_minimal_config() -> dict:
             "n_cases": 4925,
             "n_controls": 5694,
         },
+        "liftover": {
+            "enabled": False,
+        },
         "paths": {},
         "coloc": {},
     }
@@ -89,6 +92,28 @@ def test_apply_column_aliases_no_overwrite():
     # canonical column should be unchanged
     assert "chrom" in result.columns
     assert result["chrom"].iloc[0] == "1"
+
+
+def test_apply_column_aliases_gwas_catalog_fields():
+    """GWAS Catalog summary-stat fields map to canonical schema."""
+    df = pd.DataFrame(
+        {
+            "variant_id": ["rs1"],
+            "chromosome": ["1"],
+            "base_pair_location": [12345],
+            "effect_allele": ["A"],
+            "other_allele": ["G"],
+            "p_value": [1e-4],
+            "standard_error": [0.1],
+        }
+    )
+    result = apply_column_aliases(df)
+    assert "rsid" in result.columns
+    assert "chrom" in result.columns
+    assert "pos" in result.columns
+    assert "non_effect_allele" in result.columns
+    assert "pvalue" in result.columns
+    assert "se" in result.columns
 
 
 # ── Palindromic SNP tests ─────────────────────────────────────────────────────
@@ -223,3 +248,32 @@ def test_harmonize_gwas_hg19_warning(caplog):
         harmonize_gwas(raw, cfg)
 
     assert any("liftover" in msg.lower() or "hg19" in msg.lower() for msg in caplog.messages)
+
+
+def test_harmonize_gwas_strict_mode_requires_liftover_config():
+    """Strict real mode should not allow silent liftover passthrough."""
+    raw = make_minimal_raw_gwas(5)
+    cfg = make_minimal_config()
+    cfg["gwas"]["source_build"] = "hg19"
+    cfg["liftover"]["enabled"] = False
+
+    with pytest.raises(RuntimeError, match="Liftover is required in real mode"):
+        harmonize_gwas(raw, cfg, strict_real_mode=True)
+
+
+def test_harmonize_gwas_attaches_qc_metrics():
+    """Harmonization should attach milestone QC counters in attrs."""
+    raw = make_minimal_raw_gwas(10)
+    cfg = make_minimal_config()
+    result = harmonize_gwas(raw, cfg)
+
+    assert "harmonization_qc" in result.attrs
+    qc = result.attrs["harmonization_qc"]
+    for key in (
+        "input_snp_count",
+        "lifted_snp_count",
+        "failed_liftover_count",
+        "palindromic_dropped_count",
+        "final_retained_snp_count",
+    ):
+        assert key in qc

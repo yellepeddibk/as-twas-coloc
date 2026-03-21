@@ -16,5 +16,9 @@ pytest>=7.4.0
 # Optional: statsmodels for FDR/BH correction
 statsmodels>=0.14.0
 
+# Liftover (real data mode)
+CrossMap>=0.7.3
+pyliftover>=0.4.1
+
 # Notebook support (optional, not required for CI)
 # jupyter>=1.0.0
