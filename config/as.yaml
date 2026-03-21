@@ -28,18 +28,31 @@ paths:
 
 # ── GWAS input ───────────────────────────────────────────────
 gwas:
-  # TODO: replace with real file path once GWAS summary stats are available
-  # Recommended source: IGAS / IMSGC / GWAS Catalog for AS
-  input_file: "data/raw/as_gwas.tsv.gz"  # placeholder
-  source_build: "hg19"  # most published AS GWAS are hg19
-  n_total: 10619          # placeholder (cases + controls from largest AS GWAS)
-  n_cases: 4925           # placeholder
-  n_controls: 5694        # placeholder
-  case_fraction: 0.4636   # n_cases / n_total — used by coloc
+  # First real-data milestone dataset:
+  # GWAS Catalog AS study accession: GCST005529
+  input_file: "data/raw/as_gwas_GCST005529.tsv.gz"
+  source_build: "hg19"
+  # Sample sizes from catalog metadata (mixed ancestry cohorts)
+  n_total: 25764
+  n_cases: 10619
+  n_controls: 15145
+  case_fraction: 0.4122   # n_cases / n_total — used by coloc
 
   # Harmonization options
   drop_palindromic_snps: true   # drop AT/CG SNPs without AF info
   af_disambiguation_available: false  # set true if allele-freq data are available
+
+# ── Liftover ────────────────────────────────────────────────
+liftover:
+  enabled: true
+  tool: "pyliftover"
+  crossmap_bin: "CrossMap.py"
+  chain_file: "data/reference/chains/hg19ToHg38.over.chain.gz"
+
+# ── Validation ──────────────────────────────────────────────
+validation:
+  gtex_overlap_tissue: "Whole_Blood"
+  gtex_overlap_min_fraction: 0.01
 
 # ── GTEx / PrediXcan resources ───────────────────────────────
 gtex:

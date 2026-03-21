@@ -50,6 +50,7 @@ RAW_COLUMN_ALIASES: dict[str, str] = {
     "MarkerName": "rsid",
     "markername": "rsid",
     "ID": "rsid",
+    "variant_id": "rsid",
     # chromosome
     "CHR": "chrom",
     "chr": "chrom",
@@ -59,6 +60,7 @@ RAW_COLUMN_ALIASES: dict[str, str] = {
     "bp": "pos",
     "POS": "pos",
     "position": "pos",
+    "base_pair_location": "pos",
     # alleles
     "A1": "effect_allele",
     "a1": "effect_allele",
@@ -66,20 +68,24 @@ RAW_COLUMN_ALIASES: dict[str, str] = {
     "A2": "non_effect_allele",
     "a2": "non_effect_allele",
     "REF": "non_effect_allele",
+    "other_allele": "non_effect_allele",
     # effect
     "BETA": "beta",
     "b": "beta",
     "Effect": "beta",
     "OR": "or",         # will be log-transformed later
+    "odds_ratio": "or",  # will be log-transformed later
     # se
     "SE": "se",
     "StdErr": "se",
+    "standard_error": "se",
     # p-value
     "P": "pvalue",
     "p": "pvalue",
     "P_BOLT_LMM_INF": "pvalue",
     "P-value": "pvalue",
     "Pvalue": "pvalue",
+    "p_value": "pvalue",
     # sample size
     "Neff": "N",
     "n": "N",

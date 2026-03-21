@@ -38,6 +38,6 @@ jobs:
         run: |
           python -m pytest tests/ -v --tb=short
 
-      - name: Smoke test: run_pipeline.py --mock
+      - name: "Smoke test: run_pipeline.py --mock"
         run: |
           python scripts/run_pipeline.py --mock --base-dir /tmp/pipeline_smoke_test
