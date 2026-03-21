@@ -1,0 +1,313 @@
+% ============================================================
+% Manuscript: Towards Coloc-Confirmed TWAS of Ankylosing Spondylitis
+%             to Prioritize Tissue-Specific Drug Targets
+%
+% Target journals (adapt formatting as needed):
+%   - Human Genomics (BioMed Central)
+%   - BMC Bioinformatics (BioMed Central)
+%   - Frontiers in Genetics (Computational Genomics section)
+%
+% NOTE TO AUTHOR:
+%   Sections marked [PLACEHOLDER] contain draft text and must be
+%   updated with real results after pipeline analyses are complete.
+%   Do NOT submit manuscript text from placeholders as scientific findings.
+% ============================================================
+
+\documentclass[12pt,a4paper]{article}
+
+% ── Packages ─────────────────────────────────────────────────
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{setspace}
+\usepackage{lineno}
+\usepackage{xcolor}
+
+% Highlight placeholders in draft
+\newcommand{\placeholder}[1]{\textcolor{red}{\textbf{[PLACEHOLDER: #1]}}}
+
+\doublespacing
+\linenumbers
+
+% ── Title and authors ─────────────────────────────────────────
+\title{Towards Colocalisation-Confirmed Transcriptome-Wide Association Study
+       of Ankylosing Spondylitis to Prioritize Tissue-Specific Drug Targets}
+
+\author{
+  \placeholder{Author Name}$^{1}$ \\
+  \\
+  $^{1}$\placeholder{Department, Institution, City, Country} \\
+  \\
+  Correspondence: \placeholder{email@institution.edu}
+}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+% ── Abstract ─────────────────────────────────────────────────
+\begin{abstract}
+\textbf{Background:}
+Ankylosing spondylitis (AS) is a chronic inflammatory spondyloarthropathy
+with substantial genetic heritability and growing GWAS-identified risk loci.
+Despite this, the causal genes and effector tissues underlying AS risk remain
+largely uncharacterized.
+
+\textbf{Methods:}
+We integrated AS GWAS summary statistics with GTEx v8 gene expression
+prediction models across \placeholder{N} tissues using S-PrediXcan.
+Global Benjamini-Hochberg false-discovery-rate correction was applied across
+all gene-tissue pairs. For FDR-significant hits, we performed Bayesian
+colocalization (coloc.abf) to distinguish genuinely co-localised GWAS and
+eQTL signals (PP4) from coincidental proximity (PP3).
+
+\textbf{Results:}
+\placeholder{Summary of real results — do not write until analyses are complete.}
+
+\textbf{Conclusions:}
+\placeholder{Conclusions — do not write until analyses are complete.}
+
+\textbf{Keywords:}
+ankylosing spondylitis; TWAS; S-PrediXcan; colocalization; coloc; eQTL; GTEx; drug target prioritization
+\end{abstract}
+
+\newpage
+
+% ── Introduction ──────────────────────────────────────────────
+\section{Introduction}
+
+Ankylosing spondylitis (AS) is a seronegative inflammatory arthritis
+predominantly affecting the axial skeleton, with a population prevalence of
+approximately 0.1--0.5\% in European populations \citep{Reveille2011}.
+The disease exhibits high heritability (estimated 70--90\%), with HLA-B*27
+as the largest genetic risk factor, accounting for $\sim$20--30\% of
+genetic variance \citep{Brown2010}.
+Genome-wide association studies (GWAS) have identified over 100 risk loci
+beyond the MHC region, yet the majority of variants lie in non-coding regions,
+complicating interpretation of their molecular mechanisms \citep{Ellinghaus2016}.
+
+Transcriptome-wide association studies (TWAS) offer a complementary approach
+to GWAS by integrating expression quantitative trait loci (eQTLs) with
+GWAS summary statistics to identify genes whose predicted expression is
+associated with disease risk \citep{Gamazon2015,Barbeira2018}.
+S-PrediXcan (MetaXcan) implements a summary-statistic-based approach that
+enables multi-tissue TWAS without requiring individual-level genotype data
+\citep{Barbeira2018}.
+The GTEx v8 resource provides high-quality eQTL prediction models trained
+on 49 tissues from 838 post-mortem donors, enabling tissue-specific
+prioritization of disease genes \citep{GTExConsortium2020}.
+
+A critical limitation of TWAS is that statistical associations may arise from
+coincidental linkage disequilibrium rather than a shared underlying causal
+variant.
+Bayesian colocalization using coloc.abf \citep{Giambartolomei2014} formally
+tests whether the GWAS signal and the eQTL signal at a given locus are driven
+by the same variant (posterior probability of hypothesis H4; PP4).
+High PP4 (typically $\geq 0.7$) provides strong evidence that the disease
+GWAS signal and the tissue-specific eQTL signal co-localize, supporting the
+gene as a causal driver of AS risk in that tissue.
+
+Here, we describe a reproducible pipeline integrating GWAS summary statistics
+for AS with GTEx v8 S-PrediXcan TWAS followed by coloc-based prioritization,
+with the aim of identifying tissue-specific candidate drug targets for AS.
+The pipeline is designed for transparency, modularity, and extensibility to
+future AS GWAS or eQTL data.
+
+% ── Methods ──────────────────────────────────────────────────
+\section{Methods}
+
+\subsection{GWAS Summary Statistics}
+
+\placeholder{Describe the AS GWAS dataset used: cohort, sample sizes,
+genotyping platform, imputation reference panel, and quality control filters.}
+
+We obtained AS GWAS summary statistics from \placeholder{source/citation}.
+The dataset comprised \placeholder{N\_cases} cases and \placeholder{N\_controls}
+controls (\placeholder{total N}).
+Summary statistics were originally reported on genome build
+\placeholder{hg19 or hg38}.
+
+\subsection{GWAS Harmonization}
+
+Raw summary statistics were harmonized to hg38 using the following steps:
+\begin{enumerate}
+  \item Column names were standardized to a canonical schema
+        (varID, chrom, pos, effect\_allele, non\_effect\_allele, beta, se, pvalue, N).
+  \item Where applicable, coordinates were lifted from hg19 to hg38 using
+        \placeholder{liftover tool (e.g., pyliftover, CrossMap)}.
+  \item GTEx-style variant identifiers (varIDs) were constructed as
+        \texttt{chr\{chrom\}\_\{pos\}\_\{ref\}\_\{alt\}\_b38}.
+        This format is required for matching GWAS variants to GTEx
+        PredictDB prediction models.
+  \item Ambiguous palindromic single-nucleotide polymorphisms (AT/CG) were
+        removed by default to prevent misalignment of effect directions across
+        strands, as these cannot be reliably strand-disambiguated without
+        allele frequency information.
+  \item Variants with missing effect sizes, standard errors, or p-values were
+        excluded.
+\end{enumerate}
+
+\subsection{Transcriptome-Wide Association Study}
+
+TWAS was performed using S-PrediXcan (MetaXcan v\placeholder{version})
+\citep{Barbeira2018} with GTEx v8 mashr-based prediction models
+\citep{GTExConsortium2020,Barbeira2019}.
+\placeholder{N} tissues relevant to AS pathophysiology were analysed,
+including \placeholder{tissue list, e.g., Whole Blood, Colon Sigmoid,
+Small Intestine Terminal Ileum, Spleen, Muscle Skeletal, Lung}.
+
+To control for multiple testing, Benjamini-Hochberg false-discovery rate
+(FDR) correction was applied globally across all gene-tissue pairs tested.
+Gene-tissue pairs with FDR-adjusted q-value $< 0.05$ were retained as
+TWAS-significant hits.
+
+\subsection{Bayesian Colocalization}
+
+For each TWAS-significant gene-tissue pair, we performed Bayesian
+colocalization using the coloc.abf function from the \texttt{coloc} R
+package (v\placeholder{version}) \citep{Giambartolomei2014}.
+Regional GWAS summary statistics ($\pm$1\,Mb around the gene transcription
+start site) and tissue-matched GTEx v8 eQTL summary statistics were extracted.
+All SNPs within the region were included without pre-filtering by p-value,
+as removing non-significant SNPs inflates PP4 estimates \citep{Wallace2021}.
+
+Effect sizes (beta) and their variances ($\sigma^2 = \mathrm{SE}^2$;
+\textit{varbeta}) were provided as inputs to coloc.abf.
+Standard coloc priors were used: $p_1 = 10^{-4}$, $p_2 = 10^{-4}$,
+$p_{12} = 10^{-5}$.
+
+Coloc results were interpreted using three complementary metrics:
+\begin{itemize}
+  \item PP4 $\geq 0.7$: primary evidence for a shared causal variant.
+  \item PP3 + PP4 $\geq 0.8$: powered locus with sufficient signal to
+        distinguish hypotheses H3 and H4.
+  \item PP4 / (PP3 + PP4) $\geq 0.9$: strong preference for shared
+        signal over distinct signals.
+\end{itemize}
+
+For loci with potential multiple independent signals
+(\placeholder{if applicable}), coloc.susie was applied as a sensitivity
+analysis \citep{Wallace2021}.
+
+\subsection{Reproducibility}
+
+All analyses were performed using a custom Python pipeline
+(available at \url{https://github.com/yellepeddibk/as-twas-coloc}).
+Each run saves a provenance manifest containing the pipeline version,
+git commit hash, configuration snapshot, coloc priors, and input file checksums.
+Random seeds were fixed throughout.
+The pipeline runs in a lightweight mock mode for CI/CD validation without
+requiring external data.
+
+% ── Results ──────────────────────────────────────────────────
+\section{Results}
+
+% NOTE: Do NOT fill in numerical results until real analyses are complete.
+% Replace all placeholders below with actual findings.
+
+\subsection{GWAS Harmonization and QC}
+
+\placeholder{
+Describe the harmonization outcome:
+- how many SNPs in raw GWAS
+- how many removed as palindromic
+- how many remained after QC
+- whether liftover was needed and how many SNPs were lost
+}
+
+\subsection{TWAS Identifies Association Signals Across Multiple Tissues}
+
+\placeholder{
+After global FDR correction across all N gene-tissue pairs tested,
+N significant gene-tissue associations were identified (FDR q < 0.05).
+These spanned N unique genes across N tissues.
+Provide summary of tissues with most hits.
+Insert Figure 2 (QQ-plot) and Figure 3 (Manhattan-style plot).
+}
+
+% Insert TWAS QQ-plot
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.6\textwidth]{../../results/figures/qqplot_twas.png}
+%   \caption{QQ-plot of TWAS p-values across all gene-tissue pairs.}
+%   \label{fig:qqplot}
+% \end{figure}
+
+% Insert Manhattan-style plot
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=\textwidth]{../../results/figures/manhattan_like_twas.png}
+%   \caption{Manhattan-style plot of TWAS associations.}
+%   \label{fig:manhattan}
+% \end{figure}
+
+\subsection{Colocalization Prioritizes a Subset of Genes with Shared Signals}
+
+\placeholder{
+Of the N TWAS-significant gene-tissue pairs, N underwent colocalization
+analysis. N gene-tissue pairs showed PP4 >= 0.7, indicating strong evidence
+for a shared causal variant between the AS GWAS signal and the tissue-specific
+eQTL. Insert Table 2 and Figure 4.
+}
+
+% Insert coloc summary barplot
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.7\textwidth]{../../results/figures/coloc_summary.png}
+%   \caption{Top coloc-confirmed gene-tissue pairs ranked by PP4.}
+%   \label{fig:coloc_barplot}
+% \end{figure}
+
+% Insert top-genes table
+% \input{top_genes_table.tex}  % generated by pipeline via manuscript_support.py
+
+% ── Discussion ───────────────────────────────────────────────
+\section{Discussion}
+
+\placeholder{
+Discuss the biological significance of top coloc-confirmed genes.
+Connect to known AS biology (e.g., IL-17/IL-23 axis, TNF, HLA region).
+Discuss tissue-specificity of findings (gut, blood, immune tissues).
+Compare to prior TWAS/coloc studies of AS or related diseases.
+Discuss drug target implications.
+}
+
+% ── Limitations ──────────────────────────────────────────────
+\section{Limitations}
+
+The current analysis has several limitations that should be considered when
+interpreting findings.
+First, the GTEx v8 eQTL models are derived from post-mortem tissues, which
+may not fully capture in vivo inflammatory states relevant to AS.
+Second, the application of coloc.abf assumes a single causal variant per locus;
+for loci with multiple independent signals, coloc.susie should be applied.
+Third, the GTEx sample sizes for individual tissues may be insufficient to
+detect eQTLs for all disease-relevant genes.
+\placeholder{Add additional limitations identified during analysis.}
+
+% ── Future Work ──────────────────────────────────────────────
+\section{Future Work}
+
+\placeholder{
+Describe planned extensions:
+- Multi-ancestry TWAS using diverse reference panels
+- Integration of chromatin accessibility data (ATAC-seq) to prioritize regulatory mechanisms
+- Functional validation in AS patient-derived cell lines
+- Drug repurposing analysis using DGIdb or OpenTargets
+- coloc.susie for multi-causal loci
+}
+
+% ── References ───────────────────────────────────────────────
+\section*{Acknowledgements}
+
+\placeholder{Acknowledge funding sources, advisors, and data providers.}
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}
