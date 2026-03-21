@@ -1,0 +1,2 @@
+input_snp_count	lifted_snp_count	failed_liftover_count	palindromic_dropped_count	final_retained_snp_count
+123941	123925	16	14032	109893
