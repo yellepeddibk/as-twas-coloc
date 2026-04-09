@@ -8,9 +8,9 @@
 
 **Title**: Towards Colocalisation-Confirmed Transcriptome-Wide Association Study of Ankylosing Spondylitis to Prioritize Tissue-Specific Drug Targets
 
-**Authors**: [PLACEHOLDER: Author Name, Institution]
+**Author**: Bhargav Yellepeddi, Iowa State University
 
-**Contact**: [PLACEHOLDER: email / ORCID]
+**Contact**: yellepeddibk@gmail.com
 
 ---
 
