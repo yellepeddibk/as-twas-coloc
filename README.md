@@ -123,6 +123,30 @@ python -m pytest tests/ -v
 
 All tests run in mock mode and do not require external data.
 
+### 4. Build Poster Milestone 1 Outputs (real intake QC)
+
+```bash
+python scripts/build_poster_milestone1.py --base-dir .
+```
+
+This generates poster-ready intake artifacts:
+- `results/tables/poster_gwas_intake_qc.tsv`
+- `results/tables/poster_gtex_overlap_qc.tsv`
+- `results/figures/poster_gwas_intake_funnel.png`
+- `results/figures/poster_gtex_overlap_fraction.png`
+- `docs/poster/results_milestone1.md`
+
+### 5. Check Real TWAS + COLOC Prerequisites
+
+```bash
+python scripts/check_real_analysis_prereqs.py --config config/as.yaml --base-dir .
+```
+
+This prints a strict OK/MISSING checklist for the 3 poster tissues:
+- `Whole_Blood`
+- `Spleen`
+- `Small_Intestine_Terminal_Ileum`
+
 ---
 
 ## Prerequisites for Real Execution
