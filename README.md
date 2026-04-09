@@ -147,6 +147,28 @@ This prints a strict OK/MISSING checklist for the 3 poster tissues:
 - `Spleen`
 - `Small_Intestine_Terminal_Ileum`
 
+### 6. Provide Gene-Level eQTL Regions for Real COLOC
+
+The real COLOC stage now expects pre-extracted eQTL region files for each
+TWAS-significant gene/tissue pair.
+
+Default path pattern:
+
+```text
+data/interim/eqtl_regions/{tissue}/{gene}.tsv.gz
+```
+
+Required columns in each file:
+- `varID`
+- `beta`
+- `se`
+- `pvalue`
+
+Optional column:
+- `N` (falls back to 200 if omitted)
+
+You can change the pattern with `coloc.eqtl_region_pattern` in `config/as.yaml`.
+
 ---
 
 ## Prerequisites for Real Execution
