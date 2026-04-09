@@ -169,6 +169,18 @@ Optional column:
 
 You can change the pattern with `coloc.eqtl_region_pattern` in `config/as.yaml`.
 
+Generate these files with:
+
+```bash
+python scripts/build_eqtl_regions_for_coloc.py \
+    --config config/as.yaml \
+    --base-dir . \
+    --gene-annotation data/reference/gencode.v38.annotation.gtf.gz
+```
+
+This writes region files under `data/interim/eqtl_regions/` and a build summary at
+`data/processed/qc/eqtl_region_build_summary.tsv`.
+
 ---
 
 ## Prerequisites for Real Execution
