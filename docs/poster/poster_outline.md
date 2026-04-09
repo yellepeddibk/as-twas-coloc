@@ -8,9 +8,9 @@
 
 **Title**: Towards Colocalisation-Confirmed Transcriptome-Wide Association Study of Ankylosing Spondylitis to Prioritize Tissue-Specific Drug Targets
 
-**Authors**: [PLACEHOLDER: Author Name, Institution]
+**Author**: Bhargav Yellepeddi, Iowa State University
 
-**Contact**: [PLACEHOLDER: email / ORCID]
+**Contact**: yellepeddibk@gmail.com
 
 ---
 
@@ -64,7 +64,13 @@ AS GWAS summary stats
 
 ## 3. Results (Center)
 
-> **[PLACEHOLDER — Do NOT fill until real analyses are complete]**
+### Milestone 1 completed (real GWAS intake and QC)
+
+- Harmonization and GTEx varID mapping completed on real AS GWAS input
+- QC summary and overlap sanity-check are available for poster drafting
+- See generated metrics: `docs/poster/results_milestone1.md`
+
+### Milestone 2 pending (real TWAS + COLOC)
 
 - N gene-tissue pairs tested across N tissues
 - N TWAS-significant hits (FDR q < 0.05)
@@ -100,9 +106,12 @@ AS GWAS summary stats
 
 ## 6. Next Steps (Bottom Center)
 
-- [ ] Download and process real AS GWAS summary statistics
-- [ ] Run S-PrediXcan across GTEx v8 tissues
-- [ ] Run coloc.abf for TWAS hits
+- [x] Download and process real AS GWAS summary statistics
+- [ ] Install MetaXcan and configure `spredixcan.script`
+- [ ] Add GTEx model DB + covariance files for 3 poster tissues
+- [ ] Add GTEx v8 eQTL directory for coloc regional extraction
+- [ ] Run S-PrediXcan across 3 poster tissues
+- [ ] Run coloc.abf for TWAS-significant hits
 - [ ] Functional annotation of top genes
 - [ ] Drug target mapping (OpenTargets, DGIdb)
 - [ ] coloc.susie for multi-causal loci

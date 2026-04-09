@@ -1,0 +1,2 @@
+tissue	model_db	model_variant_column	gwas_unique_varids	model_unique_varids	overlap_varids	overlap_fraction
+Whole_Blood	C:\Users\yelle\OneDrive\My-Folders\Code\Projects\as-twas-coloc\data\reference\gtex_v8_models\gtex_v8_mashr_Whole_Blood.db	varID	109752	22251	177	0.0016127268751366
