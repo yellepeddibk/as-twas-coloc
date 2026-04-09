@@ -45,6 +45,7 @@ from src.twas import (
     make_mock_spredixcan_result,
 )
 from src.coloc import (
+    build_coloc_dataset,
     aggregate_coloc_results,
     interpret_coloc_result,
     make_mock_coloc_result,
@@ -199,10 +200,13 @@ def run_pipeline(
     if mock:
         _run_mock_coloc(twas_hits, cfg, coloc_out_dir)
     else:
-        raise RuntimeError(
-            "Real-mode COLOC path is not fully wired yet. "
-            "No mock fallback is allowed in real mode. "
-            "Complete eQTL regional extraction + coloc wiring before running --no-mock end-to-end."
+        _run_real_coloc(
+            twas_hits=twas_hits,
+            harmonized_gwas=harmonized_gwas,
+            cfg=cfg,
+            coloc_priors=coloc_priors,
+            coloc_out_dir=coloc_out_dir,
+            base_dir=base_dir,
         )
 
     # ── Stage 11-12: Rank and output genes ────────────────────
@@ -304,6 +308,119 @@ def _run_mock_coloc(
         save_coloc_result(annotated, out_path)
 
     logger.info("[MOCK] Saved COLOC results for %d gene-tissue pairs.", min(len(twas_hits), 10))
+
+
+def _run_real_coloc(
+    twas_hits: pd.DataFrame,
+    harmonized_gwas: pd.DataFrame,
+    cfg: Dict[str, Any],
+    coloc_priors: Dict[str, float],
+    coloc_out_dir: Path,
+    base_dir: Path,
+) -> None:
+    """Run real coloc.abf using pre-extracted eQTL regional files.
+
+    Expected eQTL file pattern (configurable):
+      data/interim/eqtl_regions/{tissue}/{gene}.tsv.gz
+
+    Required columns in each eQTL file:
+      varID, beta, se, pvalue
+    Optional:
+      N (falls back to 200 if not present)
+    """
+    if twas_hits.empty:
+        logger.info("No TWAS hits; skipping real COLOC stage.")
+        return
+
+    coloc_cfg = cfg.get("coloc", {})
+    pattern = coloc_cfg.get(
+        "eqtl_region_pattern",
+        "data/interim/eqtl_regions/{tissue}/{gene}.tsv.gz",
+    )
+
+    required_cols = {"varID", "beta", "se", "pvalue"}
+    gwas_cfg = cfg.get("gwas", {})
+    n_gwas = int(gwas_cfg.get("n_total", 0))
+    n_cases = gwas_cfg.get("n_cases")
+    n_controls = gwas_cfg.get("n_controls")
+    s_fraction = gwas_cfg.get("case_fraction")
+
+    missing_eqtl_paths: List[str] = []
+    n_attempted = 0
+    n_completed = 0
+
+    for _, row in twas_hits.iterrows():
+        gene_id = str(row.get("gene", "")).strip()
+        tissue = str(row.get("tissue", "")).strip()
+        if not gene_id or not tissue:
+            logger.warning("Skipping TWAS hit missing gene/tissue identifiers: %s", row.to_dict())
+            continue
+
+        n_attempted += 1
+        eqtl_path = Path(pattern.format(tissue=tissue, gene=gene_id))
+        if not eqtl_path.is_absolute():
+            eqtl_path = base_dir / eqtl_path
+
+        if not eqtl_path.exists():
+            missing_eqtl_paths.append(str(eqtl_path))
+            continue
+
+        eqtl_locus = read_tsv_gz(eqtl_path)
+        missing_cols = required_cols - set(eqtl_locus.columns)
+        if missing_cols:
+            raise ValueError(
+                f"eQTL region file is missing required columns {sorted(missing_cols)}: {eqtl_path}"
+            )
+
+        dataset1, dataset2 = build_coloc_dataset(
+            gwas_locus=harmonized_gwas,
+            eqtl_locus=eqtl_locus,
+            n_gwas=n_gwas,
+            n_cases=n_cases,
+            n_controls=n_controls,
+            s_fraction=s_fraction,
+            dataset_type="cc",
+        )
+
+        if not dataset1 or not dataset2:
+            logger.warning(
+                "Skipping coloc for %s / %s because shared SNP set is empty.",
+                gene_id,
+                tissue,
+            )
+            continue
+
+        raw_result = run_coloc_abf(
+            dataset1=dataset1,
+            dataset2=dataset2,
+            priors=coloc_priors,
+            r_script=cfg.get("coloc", {}).get("r_script"),
+            mock=False,
+        )
+        annotated = interpret_coloc_result(raw_result, cfg)
+        out_path = coloc_out_dir / tissue / f"{gene_id}.json"
+        save_coloc_result(annotated, out_path)
+        n_completed += 1
+
+    if n_completed == 0:
+        preview = "\n  - ".join(missing_eqtl_paths[:10])
+        suffix = "\n  - ..." if len(missing_eqtl_paths) > 10 else ""
+        raise RuntimeError(
+            "Real COLOC could not run because no gene-level eQTL region files were available. "
+            "Add pre-extracted files matching config coloc.eqtl_region_pattern "
+            "(default: data/interim/eqtl_regions/{tissue}/{gene}.tsv.gz)."
+            + (f"\nMissing examples:\n  - {preview}{suffix}" if missing_eqtl_paths else "")
+        )
+
+    if missing_eqtl_paths:
+        logger.warning(
+            "Real COLOC completed for %d/%d TWAS hits; %d hits were skipped due to missing eQTL region files.",
+            n_completed,
+            n_attempted,
+            len(missing_eqtl_paths),
+        )
+    else:
+        logger.info("Real COLOC completed for %d TWAS hits.", n_completed)
 
 
 def _generate_plots(
