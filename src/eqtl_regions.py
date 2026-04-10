@@ -16,7 +16,11 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+<<<<<<< HEAD
 from typing import Dict, Iterable, List, Optional, Tuple, cast
+=======
+from typing import Dict, Iterable, List, Optional, Tuple
+>>>>>>> origin/main
 
 import pandas as pd
 
@@ -153,8 +157,12 @@ def build_eqtl_regions_for_coloc(
 
     summary_rows: List[Dict[str, object]] = []
 
+<<<<<<< HEAD
     for tissue_key, tissue_hits in hits.groupby("tissue", sort=True):
         tissue = str(tissue_key)
+=======
+    for tissue, tissue_hits in hits.groupby("tissue", sort=True):
+>>>>>>> origin/main
         tissue_genes = tissue_hits["gene"].tolist()
         gene_coords = gene_tss[gene_tss["gene"].isin(tissue_genes)].copy()
 
@@ -179,20 +187,32 @@ def build_eqtl_regions_for_coloc(
 
         for chunk in pd.read_csv(eqtl_file, sep="\t", low_memory=False, chunksize=chunk_size):
             col_map = _resolve_eqtl_columns(chunk.columns)
+<<<<<<< HEAD
             varid_col = col_map["varid"]
             beta_col = col_map["beta"]
             se_col = col_map["se"]
             pvalue_col = col_map["pvalue"]
             optional_n = col_map.get("n")
             needed = [varid_col, beta_col, se_col, pvalue_col]
+=======
+            needed = [col_map[k] for k in ["varid", "beta", "se", "pvalue"]]
+            optional_n = col_map.get("n")
+>>>>>>> origin/main
             select_cols = needed + ([optional_n] if optional_n else [])
 
             work = chunk[select_cols].copy()
             rename = {
+<<<<<<< HEAD
                 varid_col: "varID",
                 beta_col: "beta",
                 se_col: "se",
                 pvalue_col: "pvalue",
+=======
+                col_map["varid"]: "varID",
+                col_map["beta"]: "beta",
+                col_map["se"]: "se",
+                col_map["pvalue"]: "pvalue",
+>>>>>>> origin/main
             }
             if optional_n:
                 rename[optional_n] = "N"
@@ -255,7 +275,11 @@ def build_eqtl_regions_for_coloc(
     return summary_df
 
 
+<<<<<<< HEAD
 def _resolve_eqtl_columns(columns: Iterable[str]) -> Dict[str, Optional[str]]:
+=======
+def _resolve_eqtl_columns(columns: Iterable[str]) -> Dict[str, str]:
+>>>>>>> origin/main
     names = {str(c).lower(): str(c) for c in columns}
 
     def pick(candidates: List[str], key: str, required: bool = True) -> Optional[str]:
@@ -266,13 +290,18 @@ def _resolve_eqtl_columns(columns: Iterable[str]) -> Dict[str, Optional[str]]:
             raise ValueError(f"Could not resolve required eQTL column '{key}' from columns: {list(columns)}")
         return None
 
+<<<<<<< HEAD
     result: Dict[str, Optional[str]] = {
+=======
+    return {
+>>>>>>> origin/main
         "varid": pick(["varID", "variant_id", "variant", "snp"], "varid"),
         "beta": pick(["beta", "slope", "effect_size"], "beta"),
         "se": pick(["se", "slope_se", "beta_se", "effect_size_se"], "se"),
         "pvalue": pick(["pvalue", "pval_nominal", "pval", "p_value"], "pvalue"),
         "n": pick(["N", "n", "ma_samples", "sample_size"], "n", required=False),
     }
+<<<<<<< HEAD
     # Required keys are guaranteed non-null by pick(required=True), but keep
     # Optional typing for "n" to satisfy static checkers.
     result["varid"] = cast(str, result["varid"])
@@ -280,6 +309,8 @@ def _resolve_eqtl_columns(columns: Iterable[str]) -> Dict[str, Optional[str]]:
     result["se"] = cast(str, result["se"])
     result["pvalue"] = cast(str, result["pvalue"])
     return result
+=======
+>>>>>>> origin/main
 
 
 def _open_text(path: Path):
