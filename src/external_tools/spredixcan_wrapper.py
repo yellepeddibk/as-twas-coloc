@@ -83,6 +83,7 @@ def build_spredixcan_command(
         "--model_db_path",    str(model_db),
         "--covariance",       str(covariance),
         "--gwas_file",        str(gwas_file),
+        "--model_db_snp_key", sp_cfg.get("model_db_snp_key", "rsid"),
         "--snp_column",       sp_cfg.get("snp_column", "varID"),
         "--effect_allele_column",     sp_cfg.get("effect_allele_column", "effect_allele"),
         "--non_effect_allele_column", sp_cfg.get("non_effect_allele_column", "non_effect_allele"),

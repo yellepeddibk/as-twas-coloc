@@ -134,6 +134,13 @@ def apply_fdr_correction(df: pd.DataFrame, alpha: float = 0.05, method: str = "f
     if n_missing:
         logger.warning("FDR correction: %d gene-tissue pairs have missing p-values.", n_missing)
 
+    if int(valid_mask.sum()) == 0:
+        logger.warning("FDR correction skipped: no valid p-values were available.")
+        out = df.copy()
+        out["pvalue_adj"] = np.nan
+        out["significant"] = False
+        return out
+
     try:
         from statsmodels.stats.multitest import multipletests
     except ImportError as exc:
