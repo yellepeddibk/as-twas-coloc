@@ -432,7 +432,6 @@ def _build_varid(df: pd.DataFrame) -> pd.DataFrame:
 
     Note: ref = non_effect_allele, alt = effect_allele by convention here.
     In practice, ref/alt assignment depends on the reference genome.
-    TODO: In real usage, verify ref/alt orientation against the hg38 reference FASTA.
     """
     if "varID" in df.columns:
         logger.info("varID column already present; skipping varID construction.")
@@ -455,6 +454,113 @@ def _build_varid(df: pd.DataFrame) -> pd.DataFrame:
         + "_b38"
     )
     logger.info("Constructed varID for %d SNPs.", len(df))
+    return df
+
+
+def align_varid_to_model(df: pd.DataFrame, model_db_path: str) -> pd.DataFrame:
+    """Re-align GWAS varIDs to match the GTEx model by trying strand complements.
+
+    For each GWAS SNP, tries four allele orientations to match the model:
+      1. Original: neff_eff
+      2. Swapped:  eff_neff
+      3. Complement: comp(neff)_comp(eff)
+      4. Complement+swapped: comp(eff)_comp(neff)
+
+    When a match requires allele swap (effect/non-effect flipped), beta is
+    negated to preserve the correct direction of effect.
+
+    Parameters
+    ----------
+    df:
+        Harmonized GWAS DataFrame with varID, effect_allele, non_effect_allele, beta.
+    model_db_path:
+        Path to a GTEx mashr .db file used to obtain model varIDs.
+
+    Returns
+    -------
+    pd.DataFrame with updated varID, alleles, and beta (sign-corrected).
+    """
+    import sqlite3
+
+    conn = sqlite3.connect(model_db_path)
+    model_varids = set(
+        row[0] for row in conn.execute("SELECT DISTINCT varID FROM weights")
+    )
+    conn.close()
+    logger.info("Loaded %d unique model varIDs for strand alignment.", len(model_varids))
+
+    df = df.copy()
+    comp = _COMPLEMENT
+
+    chrom = df["chrom"].astype(str)
+    pos = df["pos"].astype(int).astype(str)
+    eff = df["effect_allele"].values
+    neff = df["non_effect_allele"].values
+
+    new_varids = []
+    new_eff = []
+    new_neff = []
+    flip_beta = []
+    match_type = []
+
+    prefix = "chr" + chrom + "_" + pos + "_"
+    suffix = "_b38"
+
+    for i in range(len(df)):
+        pfx = prefix.iloc[i]
+        e, n = str(eff[i]), str(neff[i])
+        ce = "".join(comp.get(c, c) for c in e)
+        cn = "".join(comp.get(c, c) for c in n)
+
+        vid1 = pfx + n + "_" + e + suffix       # original
+        vid2 = pfx + e + "_" + n + suffix       # swapped
+        vid3 = pfx + cn + "_" + ce + suffix     # complement
+        vid4 = pfx + ce + "_" + cn + suffix     # complement + swapped
+
+        if vid1 in model_varids:
+            new_varids.append(vid1)
+            new_eff.append(e)
+            new_neff.append(n)
+            flip_beta.append(False)
+            match_type.append("original")
+        elif vid2 in model_varids:
+            new_varids.append(vid2)
+            new_eff.append(n)
+            new_neff.append(e)
+            flip_beta.append(True)
+            match_type.append("swapped")
+        elif vid3 in model_varids:
+            new_varids.append(vid3)
+            new_eff.append(ce)
+            new_neff.append(cn)
+            flip_beta.append(False)
+            match_type.append("complement")
+        elif vid4 in model_varids:
+            new_varids.append(vid4)
+            new_eff.append(cn)
+            new_neff.append(ce)
+            flip_beta.append(True)
+            match_type.append("complement_swapped")
+        else:
+            new_varids.append(df["varID"].iloc[i])
+            new_eff.append(e)
+            new_neff.append(n)
+            flip_beta.append(False)
+            match_type.append("unmatched")
+
+    df["varID"] = new_varids
+    df["effect_allele"] = new_eff
+    df["non_effect_allele"] = new_neff
+    df.loc[[f for f in range(len(flip_beta)) if flip_beta[f]], "beta"] *= -1
+
+    import collections
+    counts = collections.Counter(match_type)
+    logger.info(
+        "varID strand alignment: original=%d swapped=%d complement=%d "
+        "complement_swapped=%d unmatched=%d",
+        counts["original"], counts["swapped"], counts["complement"],
+        counts["complement_swapped"], counts["unmatched"],
+    )
     return df
 
 

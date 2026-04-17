@@ -83,7 +83,7 @@ def build_spredixcan_command(
         "--model_db_path",    str(model_db),
         "--covariance",       str(covariance),
         "--gwas_file",        str(gwas_file),
-        "--model_db_snp_key", sp_cfg.get("model_db_snp_key", "rsid"),
+        "--model_db_snp_key", sp_cfg.get("model_db_snp_key", "varID"),
         "--snp_column",       sp_cfg.get("snp_column", "varID"),
         "--effect_allele_column",     sp_cfg.get("effect_allele_column", "effect_allele"),
         "--non_effect_allele_column", sp_cfg.get("non_effect_allele_column", "non_effect_allele"),
@@ -91,6 +91,7 @@ def build_spredixcan_command(
         "--se_column",        sp_cfg.get("se_column", "se"),
         "--pvalue_column",    sp_cfg.get("pvalue_column", "pvalue"),
         "--output_file",      str(output_file),
+        "--keep_non_rsid",
     ]
 
     logger.info("Built S-PrediXcan command for tissue '%s'.", tissue)
