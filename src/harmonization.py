@@ -367,12 +367,15 @@ def _liftover_with_pyliftover(df: pd.DataFrame, chain_path: Path) -> pd.DataFram
 
     for _, row in work_df.iterrows():
         chrom = f"chr{str(row['chrom']).replace('chr', '')}"
-        pos = int(row["pos"])
-        conv = lo.convert_coordinate(chrom, pos)
+        # pyliftover expects 0-based coordinates; GWAS positions are 1-based.
+        pos_1based = int(row["pos"])
+        pos_0based = pos_1based - 1
+        conv = lo.convert_coordinate(chrom, pos_0based)
         if conv:
             tgt_chr, tgt_pos = conv[0][0], conv[0][1]
             mapped_chrom.append(str(tgt_chr).replace("chr", ""))
-            mapped_pos.append(int(round(tgt_pos)))
+            # convert back to 1-based genomic position
+            mapped_pos.append(int(round(tgt_pos)) + 1)
             mapped_ok.append(True)
         else:
             mapped_chrom.append(None)

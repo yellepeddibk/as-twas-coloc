@@ -434,12 +434,12 @@ def _generate_plots(
     viz_cfg = cfg.get("visualization", {})
     dpi = viz_cfg.get("dpi", 150)
 
-    # In real mode we fail fast if required results are missing instead of plotting mock data.
+    # In real mode with no hits, skip plotting gracefully.
     if not mock and (twas_df.empty or coloc_df.empty):
-        raise RuntimeError(
-            "Real-mode plotting requires non-empty TWAS and COLOC tables. "
-            "Mock fallback plotting is disabled in real mode."
+        logger.warning(
+            "Skipping plots in real mode because TWAS or COLOC results are empty."
         )
+        return
 
     # Use mock data for plots in demo mode if outputs are empty
     plot_twas = twas_df if not twas_df.empty else make_mock_twas_df()

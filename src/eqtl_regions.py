@@ -251,6 +251,18 @@ def build_eqtl_regions_for_coloc(
                 "output_path": str(out_path),
             })
 
+    if not summary_rows:
+        return pd.DataFrame(
+            columns=[
+                "gene",
+                "tissue",
+                "status",
+                "eqtl_rows_in_window",
+                "shared_snps_with_gwas",
+                "output_path",
+            ]
+        )
+
     summary_df = pd.DataFrame(summary_rows).sort_values(["status", "tissue", "gene"]).reset_index(drop=True)
     return summary_df
 

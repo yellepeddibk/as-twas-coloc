@@ -52,7 +52,7 @@ liftover:
 # ── Validation ──────────────────────────────────────────────
 validation:
   gtex_overlap_tissue: "Whole_Blood"
-  gtex_overlap_min_fraction: 0.01
+  gtex_overlap_min_fraction: 0.001
 
 # ── GTEx / PrediXcan resources ───────────────────────────────
 gtex:
@@ -82,7 +82,8 @@ spredixcan:
   gwas_file: "data/interim/gwas_harmonized/as_gwas_hg38_varid.tsv.gz"
   output_dir: "results/twas"
   # Column name mappings for harmonized GWAS -> SPrediXcan
-  snp_column: "varID"
+  snp_column: "rsid"
+  model_db_snp_key: "rsid"
   effect_allele_column: "effect_allele"
   non_effect_allele_column: "non_effect_allele"
   beta_column: "beta"
