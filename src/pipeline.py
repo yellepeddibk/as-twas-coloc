@@ -134,6 +134,22 @@ def run_pipeline(
     logger.info("Stage 2: Harmonize GWAS")
     harmonized_gwas = harmonize_gwas(raw_gwas, cfg, strict_real_mode=not mock)
 
+    # ── Stage 2b: Align varIDs to model (strand harmonization) ─
+    if not mock:
+        from src.harmonization import align_varid_to_model
+        gtex_cfg = cfg.get("gtex", {})
+        model_dir = Path(gtex_cfg.get("model_dir", "data/reference/gtex_v8_models"))
+        # Use first tissue model as reference for varID alignment
+        first_tissue = get_tissues(cfg)[0]
+        sp_cfg = cfg.get("spredixcan", {})
+        model_pattern = sp_cfg.get("model_db_pattern", "{model_dir}/gtex_v8_mashr_{tissue}.db")
+        ref_model_db = Path(model_pattern.format(model_dir=model_dir, tissue=first_tissue))
+        if ref_model_db.exists():
+            logger.info("Stage 2b: Aligning GWAS varIDs to model (strand harmonization)")
+            harmonized_gwas = align_varid_to_model(harmonized_gwas, str(ref_model_db))
+        else:
+            logger.warning("Model DB not found at %s; skipping varID alignment.", ref_model_db)
+
     # ── Stage 3: Save harmonized GWAS ─────────────────────────
     logger.info("Stage 3: Save harmonized GWAS")
     harm_dir = base_dir / paths.get("data_interim", "data/interim") / "gwas_harmonized"
