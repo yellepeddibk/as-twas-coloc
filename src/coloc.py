@@ -28,6 +28,7 @@ Wallace (2021) PLOS Genetics — coloc.susie
 
 from __future__ import annotations
 
+import gzip
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -341,6 +342,123 @@ def aggregate_coloc_results(coloc_dir: str | Path) -> pd.DataFrame:
     df = pd.DataFrame(rows).sort_values("PP4", ascending=False).reset_index(drop=True)
     logger.info("Aggregated %d coloc results.", len(df))
     return df
+
+
+# ── eQTL extraction from all-pairs files ──────────────────────────────────────
+
+
+def extract_eqtl_regions(
+    twas_hits: pd.DataFrame,
+    eqtl_dir: str | Path,
+    output_dir: str | Path,
+    allpairs_pattern: str = "{tissue}.allpairs.txt.gz",
+) -> int:
+    """Extract per-gene eQTL regional files from GTEx all-pairs data.
+
+    Streams each tissue's all-pairs file once, collecting rows for all
+    TWAS-hit genes in that tissue.  Saves per-gene files with the columns
+    expected by ``build_coloc_dataset``: varID, beta, se, pvalue.
+
+    Parameters
+    ----------
+    twas_hits:
+        TWAS hits DataFrame with ``gene`` and ``tissue`` columns.
+    eqtl_dir:
+        Directory containing ``{tissue}.allpairs.txt.gz`` files.
+    output_dir:
+        Output directory; files saved as ``{tissue}/{gene}.tsv.gz``.
+    allpairs_pattern:
+        Filename pattern within *eqtl_dir*.
+
+    Returns
+    -------
+    int
+        Number of gene-tissue files written.
+    """
+    eqtl_dir = Path(eqtl_dir)
+    output_dir = Path(output_dir)
+
+    # Group genes by tissue for efficient single-pass streaming
+    hits_by_tissue: Dict[str, set] = {}
+    for _, row in twas_hits.iterrows():
+        tissue = str(row["tissue"])
+        gene = str(row["gene"])
+        hits_by_tissue.setdefault(tissue, set()).add(gene)
+
+    n_written = 0
+    for tissue, gene_set in hits_by_tissue.items():
+        allpairs_path = eqtl_dir / allpairs_pattern.format(tissue=tissue)
+        if not allpairs_path.exists():
+            logger.warning("All-pairs file not found: %s; skipping tissue.", allpairs_path)
+            continue
+
+        # Skip tissue if all genes already extracted
+        tissue_out = output_dir / tissue
+        existing = {p.stem.replace(".tsv", "") for p in tissue_out.glob("*.tsv.gz")} if tissue_out.exists() else set()
+        missing_genes = gene_set - existing
+        if not missing_genes:
+            logger.info("All %d genes already extracted for %s; skipping.", len(gene_set), tissue)
+            n_written += len(gene_set)
+            continue
+
+        # Also match without version suffix
+        gene_prefixes = {g.split(".")[0] for g in gene_set}
+
+        logger.info(
+            "Extracting eQTL for %d genes from %s ...",
+            len(gene_set),
+            allpairs_path.name,
+        )
+
+        # Stream the all-pairs file and collect matching rows
+        gene_rows: Dict[str, list] = {g: [] for g in gene_set}
+        with gzip.open(allpairs_path, "rt") as fh:
+            header = fh.readline().strip().split("\t")
+            for line in fh:
+                fields = line.split("\t", 2)  # only need gene_id from first field
+                gene_id = fields[0]
+                # Match with version (exact) or without
+                if gene_id in gene_set:
+                    gene_rows[gene_id].append(line)
+                elif gene_id.split(".")[0] in gene_prefixes:
+                    # Map back to the versioned ID in gene_set
+                    for g in gene_set:
+                        if g.split(".")[0] == gene_id.split(".")[0]:
+                            gene_rows[g].append(line)
+                            break
+
+        # Parse and save each gene's eQTL data
+        for gene_id, rows in gene_rows.items():
+            if not rows:
+                logger.warning("No eQTL rows found for gene %s in %s.", gene_id, tissue)
+                continue
+
+            import io
+            text = "\t".join(header) + "\n" + "".join(rows)
+            df = pd.read_csv(io.StringIO(text), sep="\t")
+
+            # Rename to expected columns
+            df = df.rename(columns={
+                "variant_id": "varID",
+                "slope": "beta",
+                "slope_se": "se",
+                "pval_nominal": "pvalue",
+            })
+            df = df[["varID", "beta", "se", "pvalue"]].copy()
+
+            out_path = output_dir / tissue / f"{gene_id}.tsv.gz"
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            df.to_csv(out_path, sep="\t", index=False, compression="gzip")
+            n_written += 1
+            logger.info(
+                "  %s / %s: %d eQTL SNPs saved.",
+                tissue,
+                gene_id,
+                len(df),
+            )
+
+    logger.info("eQTL extraction complete: %d gene-tissue files written.", n_written)
+    return n_written
 
 
 # ── Mock coloc result (for testing/demo) ─────────────────────────────────────
