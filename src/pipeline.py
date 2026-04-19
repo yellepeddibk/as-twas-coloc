@@ -47,6 +47,7 @@ from src.twas import (
 from src.coloc import (
     build_coloc_dataset,
     aggregate_coloc_results,
+    extract_eqtl_regions,
     interpret_coloc_result,
     make_mock_coloc_result,
     save_coloc_result,
@@ -185,6 +186,13 @@ def run_pipeline(
             mock_df.to_csv(mock_out, index=False)
             logger.info("[MOCK] Wrote synthetic TWAS for %s.", tissue)
     else:
+        # S-PrediXcan refuses to overwrite existing output files.
+        # Remove stale outputs so real results are written.
+        for tissue in tissues:
+            stale = twas_dir / f"{tissue}.spredixcan.csv"
+            if stale.exists():
+                stale.unlink()
+                logger.info("Removed stale S-PrediXcan output: %s", stale.name)
         # Build and execute real S-PrediXcan commands
         from src.external_tools.spredixcan_wrapper import run_all_tissues
         run_all_tissues(cfg, tissues=tissues, dry_run=False)
@@ -207,6 +215,18 @@ def run_pipeline(
     twas_hits = filter_twas_hits(twas_all)
     hits_path = base_dir / paths.get("data_processed", "data/processed") / "twas_hits" / "twas_hits_fdr05.tsv.gz"
     write_tsv_gz(twas_hits, hits_path)
+
+    # ── Stage 7b: Extract eQTL regions for TWAS hits ─────────
+    if not mock and not twas_hits.empty:
+        gtex_cfg = cfg.get("gtex", {})
+        eqtl_dir = base_dir / gtex_cfg.get("eqtl_dir", "data/reference/gtex_v8_eqtl")
+        eqtl_out = base_dir / "data" / "interim" / "eqtl_regions"
+        logger.info("Stage 7b: Extracting eQTL regions from all-pairs files")
+        extract_eqtl_regions(
+            twas_hits=twas_hits,
+            eqtl_dir=eqtl_dir,
+            output_dir=eqtl_out,
+        )
 
     # ── Stages 8-10: COLOC ────────────────────────────────────
     logger.info("Stages 8-10: COLOC (mock=%s)", mock)

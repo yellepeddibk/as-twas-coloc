@@ -73,6 +73,7 @@ dataset2 <- list(
   N        = as.integer(ds2$N),
   type     = ds2$type
 )
+if (!is.null(ds2$sdY)) dataset2$sdY <- as.numeric(ds2$sdY)
 
 # ── Run coloc.abf ─────────────────────────────────────────────────────────────
 result <- tryCatch(
