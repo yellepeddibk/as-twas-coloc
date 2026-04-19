@@ -161,6 +161,10 @@ def build_coloc_dataset(
     g = gwas_locus.set_index("varID").loc[list(shared_ids)].copy()
     e = eqtl_locus.set_index("varID").loc[list(shared_ids)].copy()
 
+    # Drop duplicate varIDs (keep first); coloc.abf requires unique SNPs
+    g = g[~g.index.duplicated(keep="first")]
+    e = e[~e.index.duplicated(keep="first")]
+
     # Ensure consistent SNP ordering
     g = g.sort_index()
     e = e.sort_index()
@@ -168,6 +172,22 @@ def build_coloc_dataset(
     # ── Compute varbeta ────────────────────────────────────────
     g["varbeta"] = g["se"] ** 2
     e["varbeta"] = e["se"] ** 2
+
+    # Drop SNPs with NaN/Inf/zero in beta or varbeta.
+    # coloc.abf computes p = pnorm(abs(beta/sqrt(varbeta))); varbeta==0 -> NaN.
+    valid = (
+        g["beta"].notna() & g["varbeta"].notna()
+        & np.isfinite(g["beta"]) & np.isfinite(g["varbeta"])
+        & (g["varbeta"] > 0)
+        & e["beta"].notna() & e["varbeta"].notna()
+        & np.isfinite(e["beta"]) & np.isfinite(e["varbeta"])
+        & (e["varbeta"] > 0)
+    )
+    if not valid.all():
+        n_drop = (~valid).sum()
+        logger.warning("Dropping %d SNPs with NaN/Inf/zero beta or varbeta.", n_drop)
+        g = g.loc[valid]
+        e = e.loc[valid]
 
     # ── Case fraction ──────────────────────────────────────────
     if s_fraction is None and n_cases is not None and n_gwas > 0:
@@ -199,6 +219,7 @@ def build_coloc_dataset(
         "varbeta": e["varbeta"].tolist(),
         "N":       int(e["N"].median()) if "N" in e.columns else 200,  # GTEx typical N
         "type":    "quant",  # eQTL is always quantitative
+        "sdY":     1.0,      # GTEx expression is inverse-normal transformed
     }
 
     logger.info(
