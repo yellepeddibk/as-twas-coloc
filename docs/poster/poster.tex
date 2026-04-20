@@ -4,7 +4,7 @@
 % Build: latexmk -pdf poster.tex  (or: make poster)
 
 \documentclass[final]{beamer}
-\usepackage[orientation=landscape, size=custom, width=121.92, height=91.44, scale=1.3]{beamerposter}
+\usepackage[orientation=landscape, size=custom, width=121.92, height=91.44, scale=1.0]{beamerposter}
 \usepackage{beamerthemeISU}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -26,10 +26,9 @@ of Ankylosing Spondylitis to Prioritize Tissue-Specific Drug Targets}
 \date{}
 
 % ── Document ─────────────────────────────────────────────────────────────────
+\setlength{\belowcaptionskip}{-8pt}
 \begin{document}
 \begin{frame}[t]
-\vskip1cm
-
 \begin{columns}[t]
 
 % ══════════════════════════════════════════════════════════════════════════════
@@ -41,23 +40,20 @@ of Ankylosing Spondylitis to Prioritize Tissue-Specific Drug Targets}
 \begin{block}{Introduction}
 \justifying
 \textbf{Ankylosing spondylitis (AS)} is a chronic inflammatory arthritis of
-the spine and sacroiliac joints affecting approximately 0.1--0.5\% of the
-population, with onset typically before age 30. While genome-wide association
-studies (GWAS) have identified over 100 risk loci, the majority fall in
-non-coding regions, making it difficult to pinpoint causal genes and
-actionable drug targets.
+the spine and sacroiliac joints affecting 0.1--0.5\% of the population,
+with onset typically before age~30. GWAS have identified over 100 risk loci,
+but most fall in non-coding regions.
 
-\vskip0.6em
+\vskip0.4em
 \textbf{Transcriptome-wide association studies (TWAS)} integrate GWAS with
-gene expression prediction models to identify genes whose genetically
-regulated expression is associated with disease risk. However, TWAS hits can
-arise from \textit{linkage disequilibrium (LD) contamination} rather than
-true shared causal variants.
+gene expression models to identify genes whose genetically regulated
+expression is associated with disease. However, TWAS hits can arise from
+\textit{linkage disequilibrium (LD) contamination} rather than true shared
+causal variants.
 
-\vskip0.6em
-\textbf{Bayesian colocalization} (coloc) tests whether a GWAS signal and an
-eQTL signal share the same causal variant, distinguishing genuine
-tissue-specific regulatory effects from LD artifacts.
+\vskip0.4em
+\textbf{Bayesian colocalization} tests whether a GWAS signal and an eQTL
+signal share the same causal variant, filtering LD artifacts.
 \end{block}
 
 % ── Key Question ─────────────────────────────────────────────────────────────
@@ -70,30 +66,29 @@ colocalizes} with AS risk variants, and in which tissues?
 % ── Methods ──────────────────────────────────────────────────────────────────
 \begin{block}{Methods}
 \justifying
-\vskip0.3em
 
 % Methods flowchart
 \begin{center}
 \begin{tikzpicture}[
-  node distance=1.1cm and 0.5cm,
-  box/.style={rectangle, rounded corners=4pt, draw=ISURed, fill=ISURed!8,
-              text width=16em, minimum height=2.5em, align=center,
-              font=\small\bfseries},
-  data/.style={rectangle, rounded corners=4pt, draw=ISUGold, fill=ISUGold!15,
-               text width=14em, minimum height=2em, align=center,
-               font=\small},
-  arrow/.style={-{Stealth[length=3mm]}, thick, ISUDark}
+  node distance=0.5cm and 0.4cm,
+  box/.style={rectangle, rounded corners=3pt, draw=ISURed, fill=ISURed!8,
+              text width=14em, minimum height=2em, align=center,
+              font=\footnotesize\bfseries},
+  data/.style={rectangle, rounded corners=3pt, draw=ISUGold, fill=ISUGold!15,
+               text width=12em, minimum height=1.8em, align=center,
+               font=\footnotesize},
+  arrow/.style={-{Stealth[length=2.5mm]}, thick, ISUDark}
 ]
-  \node[data] (gwas) {AS GWAS Summary Statistics\\(GCST005529, $N$=25,764)};
-  \node[data, right=1.5cm of gwas] (gtex) {GTEx v8 Mashr eQTL Models\\(8 immune/musculoskeletal tissues)};
-  \node[box, below=0.8cm of $(gwas)!0.5!(gtex)$] (harm) {1. GWAS QC \& Harmonization\\(liftOver, strand, palindromic)};
-  \node[box, below=of harm] (twas) {2. S-PrediXcan TWAS\\(2,316 gene-tissue tests)};
-  \node[box, below=of twas] (fdr) {3. FDR Correction\\(Benjamini--Hochberg, $\alpha=0.05$)};
-  \node[box, below=of fdr] (coloc) {4. Bayesian Colocalization\\(coloc.abf, PP4 $\geq$ 0.70)};
-  \node[box, below=of coloc] (out) {5. Prioritized Gene List\\(35 coloc-confirmed pairs)};
+  \node[data] (gwas) {AS GWAS (GCST005529)\\$N$=25,764};
+  \node[data, right=1.2cm of gwas] (gtex) {GTEx v8 Mashr Models\\8 tissues};
+  \node[box, below=0.4cm of $(gwas)!0.5!(gtex)$] (harm) {1. GWAS QC \& Harmonization};
+  \node[box, below=of harm] (twas) {2. S-PrediXcan TWAS};
+  \node[box, below=of twas] (fdr) {3. FDR Correction (BH, $\alpha$=0.05)};
+  \node[box, below=of fdr] (coloc) {4. Colocalization (PP4 $\geq$ 0.70)};
+  \node[box, below=of coloc] (out) {5. Prioritized Gene List};
 
-  \draw[arrow] (gwas.south) -- ++(0,-0.3) -| (harm.north);
-  \draw[arrow] (gtex.south) -- ++(0,-0.3) -| (harm.north);
+  \draw[arrow] (gwas.south) -- ++(0,-0.2) -| (harm.north);
+  \draw[arrow] (gtex.south) -- ++(0,-0.2) -| (harm.north);
   \draw[arrow] (harm) -- (twas);
   \draw[arrow] (twas) -- (fdr);
   \draw[arrow] (fdr) -- (coloc);
@@ -101,11 +96,10 @@ colocalizes} with AS risk variants, and in which tissues?
 \end{tikzpicture}
 \end{center}
 
-\vskip0.3em
-\textbf{GWAS QC:} 123,941 input SNPs $\to$ liftOver hg38 $\to$ 14,032
-palindromic SNPs removed $\to$ 109,893 harmonized variants.
+\textbf{GWAS QC:} 123,941 SNPs $\to$ liftOver hg38 $\to$ 14,032
+palindromic removed $\to$ 109,893 harmonized.
 
-\vskip0.3em
+\vskip0.2em
 \textbf{Tissues:} Whole Blood, Spleen, Lung, Colon Sigmoid, Colon
 Transverse, Small Intestine, Muscle Skeletal, Adipose Subcutaneous.
 \end{block}
@@ -125,18 +119,18 @@ tissues. After Benjamini--Hochberg FDR correction ($\alpha = 0.05$),
 \textbf{248 significant associations} were identified, spanning genes on
 multiple chromosomes.
 
-\vskip0.5em
-\begin{center}
-\includegraphics[width=\linewidth]{figures/manhattan_twas.png}
-\captionof{figure}{Manhattan-style plot of TWAS $-\!\log_{10}(p)$ across 8
-tissues. Top gene symbols annotated. Dashed red line: FDR $< 0.05$.}
-\end{center}
-
 \vskip0.3em
 \begin{center}
-\includegraphics[width=0.72\linewidth]{figures/qqplot_twas.png}
-\captionof{figure}{QQ-plot showing strong departure from the null,
-consistent with polygenic architecture. Grey band: 95\% CI.}
+\includegraphics[width=0.90\linewidth]{figures/manhattan_twas.png}
+\captionof{figure}{Manhattan-style plot of TWAS $-\!\log_{10}(p)$ across 8
+tissues. Top gene symbols annotated. Dashed line: FDR $< 0.05$.}
+\end{center}
+
+\vskip0.2em
+\begin{center}
+\includegraphics[width=0.50\linewidth]{figures/qqplot_twas.png}
+\captionof{figure}{QQ-plot: departure from null consistent with
+polygenic architecture. Grey band: 95\% CI.}
 \end{center}
 \end{block}
 
@@ -147,11 +141,11 @@ Of the 248 TWAS hits, Bayesian colocalization (coloc.abf) identified
 \textbf{35 gene-tissue pairs (18 unique genes)} with PP4 $\geq$ 0.70,
 confirming a shared causal variant between GWAS and eQTL signals.
 
-\vskip0.5em
+\vskip0.3em
 \begin{center}
-\includegraphics[width=0.72\linewidth]{figures/coloc_pp4_vs_pp3pp4.png}
-\captionof{figure}{PP4 vs.\ locus power (PP3+PP4). Points in the shaded
-upper-right quadrant are colocalization-confirmed hits.}
+\includegraphics[width=0.55\linewidth]{figures/coloc_pp4_vs_pp3pp4.png}
+\captionof{figure}{PP4 vs.\ locus power (PP3+PP4). Upper-right:
+colocalization-confirmed hits.}
 \end{center}
 \end{block}
 
@@ -165,28 +159,23 @@ upper-right quadrant are colocalization-confirmed hits.}
 % ── Top Colocalized Genes ────────────────────────────────────────────────────
 \begin{block}{Top Colocalized Genes}
 \begin{center}
-\includegraphics[width=\linewidth]{figures/coloc_pp4_barplot.png}
+\includegraphics[width=0.85\linewidth]{figures/coloc_pp4_barplot.png}
 \captionof{figure}{All 35 coloc-confirmed gene-tissue pairs ranked by PP4.
-Color indicates tissue. Dashed red line: PP4 = 0.70 threshold.}
+Color indicates tissue. Dashed line: PP4 = 0.70.}
 \end{center}
 
-\vskip0.3em
-\small
+\vskip0.2em
+\footnotesize
 \begin{center}
 \begin{tabular}{@{}llccc@{}}
 \toprule
-\textbf{Gene} & \textbf{Top Tissue} & \textbf{PP4} & \textbf{$z$-score} & \textbf{FDR $p$} \\
+\textbf{Gene} & \textbf{Tissue} & \textbf{PP4} & \textbf{$z$} & \textbf{FDR $p$} \\
 \midrule
 \textit{ERAP1}   & Whole Blood      & 0.999 & 13.28  & 2.5e-38 \\
 \textit{GPR25}   & Whole Blood      & 0.997 & $-$7.03  & 6.0e-11 \\
 \textit{NPIPB7}  & Whole Blood      & 0.993 & $-$5.16  & 5.9e-06 \\
 \textit{CCDC116} & Spleen           & 0.988 & $-$5.16  & 5.9e-06 \\
 \textit{UBE2L3}  & Whole Blood      & 0.983 & 5.32   & 2.5e-06 \\
-\textit{CARD9}   & Whole Blood      & 0.974 & 4.94   & 1.7e-05 \\
-\textit{FAS}     & Colon Sigmoid    & 0.973 & 4.42   & 1.9e-04 \\
-\textit{MYH7B}   & Colon Transverse & 0.973 & 4.42   & 1.9e-04 \\
-\textit{RNF123}  & Adipose Subcut.  & 0.963 & 4.47   & 1.5e-04 \\
-\textit{PRSS53}  & Whole Blood      & 0.976 & $-$3.68  & 3.3e-03 \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -195,55 +184,48 @@ Color indicates tissue. Dashed red line: PP4 = 0.70 threshold.}
 % ── Discussion ───────────────────────────────────────────────────────────────
 \begin{block}{Discussion}
 \justifying
-\begin{itemize}
-  \item \textit{ERAP1} (aminopeptidase involved in MHC-I antigen processing)
-    is a well-established AS gene, validating our pipeline. Its strong
-    colocalization in both Whole Blood and Small Intestine highlights
-    tissue-specific regulatory mechanisms.
-  \item Novel candidates such as \textit{GPR25}, \textit{CCDC116}, and
-    \textit{NPIPB7} warrant experimental follow-up as potential
-    tissue-specific drug targets.
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item \textit{ERAP1} (MHC-I antigen processing) is a known AS gene,
+    validating our pipeline. Colocalizes in Whole Blood and Small Intestine.
+  \item Novel candidates \textit{GPR25}, \textit{CCDC116}, \textit{NPIPB7}
+    warrant experimental follow-up as tissue-specific drug targets.
   \item \textit{CARD9} and \textit{FAS} implicate innate immune and
-    apoptotic pathways beyond the canonical HLA-B27 axis.
-  \item Colocalization filtering reduced 248 TWAS hits to 35 confirmed
-    gene-tissue pairs, eliminating LD-driven false positives.
+    apoptotic pathways beyond HLA-B27.
+  \item Colocalization reduced 248 TWAS hits to 35 confirmed pairs,
+    filtering LD-driven false positives.
 \end{itemize}
 \end{block}
 
 % ── Conclusion ───────────────────────────────────────────────────────────────
 \begin{block}{Conclusion}
 \justifying
-Integrating S-PrediXcan TWAS with Bayesian colocalization across 8 tissues
-identified \textbf{18 unique genes} with strong evidence of shared causal
-variants with AS risk loci. This two-stage approach provides a principled
-filter against LD contamination and prioritizes tissue-specific regulatory
-targets for therapeutic development.
+Integrating S-PrediXcan TWAS with Bayesian colocalization identified
+\textbf{18 unique genes} with shared causal variants at AS risk loci,
+prioritizing tissue-specific targets for therapeutic development.
 \end{block}
 
 % ── Future Directions ────────────────────────────────────────────────────────
 \begin{alertblock}{Future Directions}
-\begin{itemize}
-  \item Fine-mapping with SuSiE to identify credible causal variants
+\begin{itemize}\setlength{\itemsep}{1pt}
+  \item Fine-mapping with SuSiE for credible causal variants
   \item Validation in independent AS cohorts
-  \item Drug repurposing analysis for top gene targets
-  \item Extension to additional immune-mediated diseases
+  \item Drug repurposing analysis for top targets
 \end{itemize}
 \end{alertblock}
 
 % ── Acknowledgements + QR ────────────────────────────────────────────────────
 \begin{block}{Acknowledgements \& Code}
 \begin{columns}[T]
-\begin{column}{0.72\textwidth}
-\small
+\begin{column}{0.70\textwidth}
+\footnotesize
 \justifying
-The author thanks \textbf{Dr.\ Ratul Chowdhury} for mentorship and
-guidance. GWAS summary statistics from the NHGRI-EBI GWAS Catalog
-(GCST005529). Gene expression models from the GTEx Consortium (v8).
-S-PrediXcan and coloc.abf software from their respective authors.
+Thanks to \textbf{Dr.\ Ratul Chowdhury} for mentorship. GWAS data from
+NHGRI-EBI GWAS Catalog (GCST005529). Expression models from GTEx
+Consortium~(v8). S-PrediXcan and coloc.abf software authors.
 \end{column}
-\begin{column}{0.25\textwidth}
+\begin{column}{0.27\textwidth}
 \centering
-\qrcode[height=4cm]{https://github.com/yellepeddibk/as-twas-coloc}\\[0.3em]
+\qrcode[height=2.5cm]{https://github.com/yellepeddibk/as-twas-coloc}\\[0.2em]
 \scriptsize\texttt{github.com/yellepeddibk/\\as-twas-coloc}
 \end{column}
 \end{columns}

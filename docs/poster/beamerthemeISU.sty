@@ -48,35 +48,35 @@
 % ── Headline (header bar) ────────────────────────────────────────────────────
 \setbeamertemplate{headline}{%
   \leavevmode
-  \begin{beamercolorbox}[wd=\paperwidth, ht=10cm, dp=0cm]{headline}
+  \begin{beamercolorbox}[wd=\paperwidth, ht=8.5cm, dp=0cm]{headline}
     \begin{tikzpicture}[remember picture, overlay]
       % Red background already set by beamercolorbox
       % University name - left side
-      \node[anchor=west, white, font=\fontsize{42}{50}\selectfont\bfseries]
-        at ([xshift=2cm, yshift=-2.5cm] current page.north west)
+      \node[anchor=west, white, font=\fontsize{36}{44}\selectfont\bfseries]
+        at ([xshift=2cm, yshift=-2cm] current page.north west)
         {IOWA STATE UNIVERSITY};
       % Department - below university
-      \node[anchor=west, ISUGold, font=\fontsize{24}{30}\selectfont]
-        at ([xshift=2cm, yshift=-4.2cm] current page.north west)
+      \node[anchor=west, ISUGold, font=\fontsize{20}{26}\selectfont]
+        at ([xshift=2cm, yshift=-3.4cm] current page.north west)
         {Department of Chemical and Biological Engineering};
       % Event - right side
-      \node[anchor=east, white, font=\fontsize{22}{28}\selectfont]
-        at ([xshift=-2cm, yshift=-2.5cm] current page.north east)
+      \node[anchor=east, white, font=\fontsize{20}{26}\selectfont]
+        at ([xshift=-2cm, yshift=-2cm] current page.north east)
         {Honors Poster Symposium};
-      \node[anchor=east, ISUGold, font=\fontsize{22}{28}\selectfont]
-        at ([xshift=-2cm, yshift=-4.2cm] current page.north east)
+      \node[anchor=east, ISUGold, font=\fontsize{20}{26}\selectfont]
+        at ([xshift=-2cm, yshift=-3.4cm] current page.north east)
         {May 6, 2026};
       % Gold accent line at bottom of header
-      \fill[ISUGold] ([yshift=-9.4cm] current page.north west)
-        rectangle ([yshift=-9.7cm] current page.north east);
+      \fill[ISUGold] ([yshift=-7.9cm] current page.north west)
+        rectangle ([yshift=-8.2cm] current page.north east);
       % Title - centered
       \node[anchor=center, white, text width=0.85\paperwidth, align=center,
-            font=\fontsize{52}{60}\selectfont\bfseries]
-        at ([yshift=-6.5cm] current page.north)
+            font=\fontsize{44}{52}\selectfont\bfseries]
+        at ([yshift=-5.3cm] current page.north)
         {\inserttitle};
       % Author line
-      \node[anchor=center, white, font=\fontsize{28}{34}\selectfont]
-        at ([yshift=-8.5cm] current page.north)
+      \node[anchor=center, white, font=\fontsize{24}{30}\selectfont]
+        at ([yshift=-7.2cm] current page.north)
         {\insertauthor};
     \end{tikzpicture}
   \end{beamercolorbox}
@@ -84,40 +84,40 @@
 
 % ── Block styling ────────────────────────────────────────────────────────────
 \setbeamertemplate{block begin}{%
-  \vskip0.5ex
-  \begin{beamercolorbox}[ht=2.8ex, dp=1ex, leftskip=1em, rightskip=1em,
+  \vskip0.3ex
+  \begin{beamercolorbox}[ht=2.5ex, dp=0.8ex, leftskip=0.8em, rightskip=0.8em,
                           rounded=true, shadow=false]{block title}%
     \usebeamerfont{block title}\insertblocktitle
   \end{beamercolorbox}%
   \vskip-0.4ex
-  \begin{beamercolorbox}[leftskip=1em, rightskip=1em, vmode,
+  \begin{beamercolorbox}[leftskip=0.8em, rightskip=0.8em, vmode,
                           rounded=true, shadow=false]{block body}%
-    \vskip0.6ex
+    \vskip0.4ex
     \usebeamerfont{block body}%
 }
 \setbeamertemplate{block end}{%
-    \vskip0.4ex
+    \vskip0.3ex
   \end{beamercolorbox}
-  \vskip0.8ex
+  \vskip0.5ex
 }
 
 % ── Alert block styling ──────────────────────────────────────────────────────
 \setbeamertemplate{block alerted begin}{%
-  \vskip0.5ex
-  \begin{beamercolorbox}[ht=2.8ex, dp=1ex, leftskip=1em, rightskip=1em,
+  \vskip0.3ex
+  \begin{beamercolorbox}[ht=2.5ex, dp=0.8ex, leftskip=0.8em, rightskip=0.8em,
                           rounded=true, shadow=false]{block alerted title}%
     \usebeamerfont{block title}\insertblocktitle
   \end{beamercolorbox}%
   \vskip-0.4ex
-  \begin{beamercolorbox}[leftskip=1em, rightskip=1em, vmode,
+  \begin{beamercolorbox}[leftskip=0.8em, rightskip=0.8em, vmode,
                           rounded=true, shadow=false]{block alerted body}%
-    \vskip0.6ex
+    \vskip0.4ex
     \usebeamerfont{block body}%
 }
 \setbeamertemplate{block alerted end}{%
-    \vskip0.4ex
+    \vskip0.3ex
   \end{beamercolorbox}
-  \vskip0.8ex
+  \vskip0.5ex
 }
 
 % ── Footer ───────────────────────────────────────────────────────────────────
