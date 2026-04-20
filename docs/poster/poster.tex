@@ -1,4 +1,4 @@
-% poster.tex -- ISU Honors Poster Symposium
+% poster.tex -- ISU Honors Poster Symposium (v2 rebalanced layout)
 % AS-TWAS-COLOC: Colocalization-Confirmed TWAS of Ankylosing Spondylitis
 % 48" x 36" landscape, beamerposter
 % Build: latexmk -pdf poster.tex  (or: make poster)
@@ -13,11 +13,10 @@
 \usepackage{booktabs}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds, calc}
-\usepackage{multicol}
 \usepackage{ragged2e}
 \usepackage{qrcode}
 \usepackage{caption}
-\captionsetup{font=small, labelfont=bf, labelsep=period, skip=0.35em}
+\captionsetup{font=small, labelfont=bf, labelsep=period, skip=0.25em}
 
 % ── Metadata ─────────────────────────────────────────────────────────────────
 \title{Colocalization-Confirmed Transcriptome-Wide Association Study\\
@@ -26,14 +25,14 @@ of Ankylosing Spondylitis to Prioritize Tissue-Specific Drug Targets}
 \date{}
 
 % ── Document ─────────────────────────────────────────────────────────────────
-\setlength{\belowcaptionskip}{0.25em}
-\setlength{\columnsep}{1.2cm}
+\setlength{\belowcaptionskip}{0.15em}
+\setlength{\columnsep}{1.0cm}
 \begin{document}
 \begin{frame}[t]
 \begin{columns}[t,onlytextwidth]
 
 % ══════════════════════════════════════════════════════════════════════════════
-% COLUMN 1 (left): Introduction, Key Question, Methods, Conclusion, Future
+% COLUMN 1 (left): Introduction, Key Question, Methods, Discussion
 % ══════════════════════════════════════════════════════════════════════════════
 \begin{column}{0.32\textwidth}
 
@@ -67,10 +66,10 @@ colocalizes} with AS risk variants, and in which tissues?
 % ── Methods ──────────────────────────────────────────────────────────────────
 \begin{block}{Methods}
 \justifying
-
-% Methods flowchart
 \begin{center}
 \begin{tikzpicture}[
+  scale=1.0,
+  transform shape,
   node distance=0.5cm and 0.4cm,
   box/.style={rectangle, rounded corners=3pt, draw=ISURed, fill=ISURed!8,
               text width=14em, minimum height=2em, align=center,
@@ -82,7 +81,7 @@ colocalizes} with AS risk variants, and in which tissues?
 ]
   \node[data] (gwas) {AS GWAS (GCST005529)\\$N$=25,764};
   \node[data, right=1.2cm of gwas] (gtex) {GTEx v8 Mashr Models\\8 tissues};
-  \node[box, below=0.4cm of $(gwas)!0.5!(gtex)$] (harm) {1. GWAS QC \& Harmonization};
+  \node[box, below=0.42cm of $(gwas)!0.5!(gtex)$] (harm) {1. GWAS QC \& Harmonization};
   \node[box, below=of harm] (twas) {2. S-PrediXcan TWAS};
   \node[box, below=of twas] (fdr) {3. FDR Correction (BH, $\alpha$=0.05)};
   \node[box, below=of fdr] (coloc) {4. Colocalization (PP4 $\geq$ 0.70)};
@@ -105,27 +104,25 @@ palindromic removed $\to$ 109,893 harmonized.
 Transverse, Small Intestine, Muscle Skeletal, Adipose Subcutaneous.
 \end{block}
 
-% ── Conclusion ───────────────────────────────────────────────────────────────
-\begin{block}{Conclusion}
+% ── Discussion ───────────────────────────────────────────────────────────────
+\begin{block}{Discussion}
 \justifying
-Integrating S-PrediXcan TWAS with Bayesian colocalization identified
-\textbf{18 unique genes} with shared causal variants at AS risk loci,
-prioritizing tissue-specific targets for therapeutic development.
-\end{block}
-
-% ── Future Directions ────────────────────────────────────────────────────────
-\begin{alertblock}{Future Directions}
-\begin{itemize}\setlength{\itemsep}{1pt}
-  \item Fine-mapping with SuSiE for credible causal variants
-  \item Validation in independent AS cohorts
-  \item Drug repurposing analysis for top targets
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item \textit{ERAP1} (MHC-I antigen processing) is a known AS gene,
+    validating our pipeline. Colocalizes in Whole Blood and Small Intestine.
+  \item Novel candidates \textit{GPR25}, \textit{CCDC116}, \textit{NPIPB7}
+    warrant experimental follow-up as tissue-specific drug targets.
+  \item \textit{CARD9} and \textit{FAS} implicate innate immune and
+    apoptotic pathways beyond HLA-B27.
+  \item Colocalization reduced 248 TWAS hits to 35 confirmed pairs,
+    filtering LD-driven false positives.
 \end{itemize}
-\end{alertblock}
+\end{block}
 
 \end{column}
 
 % ══════════════════════════════════════════════════════════════════════════════
-% COLUMN 2 (center): TWAS Results, Colocalization Results, Discussion
+% COLUMN 2 (center): TWAS Results, Coloc Results, Conclusion, Future
 % ══════════════════════════════════════════════════════════════════════════════
 \begin{column}{0.34\textwidth}
 
@@ -143,9 +140,8 @@ multiple chromosomes.
 \captionof{figure}{Manhattan-style plot of TWAS $-\!\log_{10}(p)$ across 8
 tissues. Top gene symbols annotated. Dashed line: FDR $< 0.05$.}
 \end{center}
-
 \begin{center}
-\includegraphics[width=0.55\linewidth]{figures/qqplot_twas.png}
+\includegraphics[width=0.52\linewidth]{figures/qqplot_twas.png}
 \captionof{figure}{QQ-plot: departure from null consistent with
 polygenic architecture. Grey band: 95\% CI.}
 \end{center}
@@ -160,44 +156,46 @@ confirming a shared causal variant between GWAS and eQTL signals.
 
 \vskip0.3em
 \begin{center}
-\includegraphics[width=0.60\linewidth]{figures/coloc_pp4_vs_pp3pp4.png}
+\includegraphics[width=0.58\linewidth]{figures/coloc_pp4_vs_pp3pp4.png}
 \captionof{figure}{PP4 vs.\ locus power (PP3+PP4). Upper-right:
 colocalization-confirmed hits.}
 \end{center}
 \end{block}
 
-% ── Discussion ───────────────────────────────────────────────────────────────
-\begin{block}{Discussion}
+% ── Conclusion ───────────────────────────────────────────────────────────────
+\begin{block}{Conclusion}
 \justifying
-\begin{itemize}\setlength{\itemsep}{1pt}
-  \item \textit{ERAP1} (MHC-I antigen processing) is a known AS gene,
-    validating our pipeline. Colocalizes in Whole Blood and Small Intestine.
-  \item Novel candidates \textit{GPR25}, \textit{CCDC116}, \textit{NPIPB7}
-    warrant experimental follow-up as tissue-specific drug targets.
-  \item \textit{CARD9} and \textit{FAS} implicate innate immune and
-    apoptotic pathways beyond HLA-B27.
-  \item Colocalization reduced 248 TWAS hits to 35 confirmed pairs,
-    filtering LD-driven false positives.
-\end{itemize}
+Integrating S-PrediXcan TWAS with Bayesian colocalization identified
+\textbf{18 unique genes} with shared causal variants at AS risk loci,
+prioritizing tissue-specific targets for therapeutic development.
 \end{block}
+
+% ── Future Directions ────────────────────────────────────────────────────────
+\begin{alertblock}{Future Directions}
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item Fine-mapping with SuSiE for credible causal variants
+  \item Validation in independent AS cohorts
+  \item Drug repurposing analysis for top targets
+\end{itemize}
+\end{alertblock}
 
 \end{column}
 
 % ══════════════════════════════════════════════════════════════════════════════
 % COLUMN 3 (right): Top Colocalized Genes, Acknowledgements & Code
 % ══════════════════════════════════════════════════════════════════════════════
-\begin{column}{0.32\textwidth}
+\begin{column}{0.31\textwidth}
 
 % ── Top Colocalized Genes ────────────────────────────────────────────────────
 \begin{block}{Top Colocalized Genes}
 \begin{center}
-\includegraphics[width=0.92\linewidth]{figures/coloc_pp4_barplot.png}
+\includegraphics[width=0.88\linewidth,keepaspectratio]{figures/coloc_pp4_barplot.png}
 \captionof{figure}{All 35 coloc-confirmed gene-tissue pairs ranked by PP4.
 Color indicates tissue. Dashed line: PP4 = 0.70.}
 \end{center}
 
-\vskip0.3em
-\footnotesize
+\vskip0.25em
+\small
 \begin{center}
 \begin{tabular}{@{}llccc@{}}
 \toprule
@@ -217,20 +215,17 @@ Color indicates tissue. Dashed line: PP4 = 0.70.}
 
 % ── Acknowledgements + QR ────────────────────────────────────────────────────
 \begin{block}{Acknowledgements \& Code}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.68\textwidth}
 \footnotesize
 \justifying
 Thanks to \textbf{Dr.\ Ratul Chowdhury} for mentorship. GWAS data from
 NHGRI-EBI GWAS Catalog (GCST005529). Expression models from GTEx
 Consortium~(v8). S-PrediXcan and coloc.abf software authors.
-\end{column}
-\begin{column}{0.28\textwidth}
-\centering
+
+\vskip0.5em
+\begin{center}
 \qrcode[height=2.5cm]{https://github.com/yellepeddibk/as-twas-coloc}\\[0.2em]
-\scriptsize\texttt{github.com/yellepeddibk/\\as-twas-coloc}
-\end{column}
-\end{columns}
+\scriptsize\texttt{github.com/yellepeddibk/as-twas-coloc}
+\end{center}
 \end{block}
 
 \end{column}
