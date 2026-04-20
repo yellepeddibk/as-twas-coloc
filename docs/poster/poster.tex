@@ -21,7 +21,7 @@
 % ── Metadata ─────────────────────────────────────────────────────────────────
 \title{Colocalization-Confirmed Transcriptome-Wide Association Study\\
 of Ankylosing Spondylitis to Prioritize Tissue-Specific Drug Targets}
-\author{{\large \\[0.35em] Bhargav Yellepeddi \quad $\cdot$ \quad Advisor: Dr.\ Ratul Chowdhury}}
+\author{Bhargav Yellepeddi \quad $\cdot$ \quad Advisor: Dr.\ Ratul Chowdhury}
 \date{}
 
 % ── Document ─────────────────────────────────────────────────────────────────
@@ -82,12 +82,12 @@ colocalizes} with AS risk variants, and in which tissues?
               text width=14em, minimum height=2em, align=center,
               font=\footnotesize\bfseries},
   data/.style={rectangle, rounded corners=3pt, draw=ISUGold, fill=ISUGold!15,
-               text width=12em, minimum height=1.8em, align=center,
+               text width=10em, minimum height=1.8em, align=center,
                font=\footnotesize},
   arrow/.style={-{Stealth[length=2.5mm]}, thick, ISUDark}
 ]
   \node[data] (gwas) {AS GWAS (GCST005529)\\$N$=25,764};
-  \node[data, right=1.2cm of gwas] (gtex) {GTEx v8 Mashr Models\\8 tissues};
+  \node[data, right=2.0cm of gwas] (gtex) {GTEx v8 Mashr Models\\8 tissues};
   \node[box, below=0.42cm of $(gwas)!0.5!(gtex)$] (harm) {1. GWAS QC \& Harmonization};
   \node[box, below=of harm] (twas) {2. S-PrediXcan TWAS};
   \node[box, below=of twas] (fdr) {3. FDR Correction (BH, $\alpha$=0.05)};

@@ -70,13 +70,13 @@
       \fill[ISUGold] ([yshift=-7.9cm] current page.north west)
         rectangle ([yshift=-8.2cm] current page.north east);
       % Title - centered
-      \node[anchor=center, white, text width=0.85\paperwidth, align=center,
+      \node[anchor=center, white, text width=0.70\paperwidth, align=center,
             font=\fontsize{44}{52}\selectfont\bfseries]
         at ([yshift=-5.3cm] current page.north)
         {\inserttitle};
-      % Author line
-      \node[anchor=center, white, font=\fontsize{24}{30}\selectfont]
-        at ([yshift=-7.2cm] current page.north)
+      % Author line - far right
+      \node[anchor=east, white, font=\fontsize{22}{28}\selectfont]
+        at ([xshift=-2cm, yshift=-4.8cm] current page.north east)
         {\insertauthor};
     \end{tikzpicture}
   \end{beamercolorbox}
