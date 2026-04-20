@@ -1,0 +1,130 @@
+% beamerthemeISU.sty
+% ISU (Iowa State University) beamerposter theme
+% Colors: Cardinal #C8102E, Gold #F1BE48
+% Layout: Red header bar with university text, gold accent line, white panels
+
+\ProvidesPackage{beamerthemeISU}
+
+% ── Packages ─────────────────────────────────────────────────────────────────
+\RequirePackage{tikz}
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+\RequirePackage{etoolbox}
+
+% ── ISU Brand Colors ─────────────────────────────────────────────────────────
+\definecolor{ISURed}{HTML}{C8102E}
+\definecolor{ISUGold}{HTML}{F1BE48}
+\definecolor{ISUDark}{HTML}{524727}
+\definecolor{ISUGray}{HTML}{707372}
+\definecolor{ISULightGray}{HTML}{F0F0F0}
+\definecolor{PanelBG}{HTML}{FFFFFF}
+
+% ── Beamer color theme ───────────────────────────────────────────────────────
+\setbeamercolor{headline}{bg=ISURed, fg=white}
+\setbeamercolor{title in headline}{fg=white}
+\setbeamercolor{author in headline}{fg=white}
+\setbeamercolor{institute in headline}{fg=ISUGold}
+\setbeamercolor{block title}{bg=ISURed, fg=white}
+\setbeamercolor{block body}{bg=PanelBG, fg=black}
+\setbeamercolor{block alerted title}{bg=ISUGold, fg=ISUDark}
+\setbeamercolor{block alerted body}{bg=PanelBG, fg=black}
+\setbeamercolor{structure}{fg=ISURed}
+\setbeamercolor{itemize item}{fg=ISURed}
+\setbeamercolor{itemize subitem}{fg=ISUGold}
+\setbeamercolor{caption name}{fg=ISURed}
+
+% ── Beamer font theme ────────────────────────────────────────────────────────
+\setbeamerfont{headline title}{size=\VeryHuge, series=\bfseries}
+\setbeamerfont{headline author}{size=\Large}
+\setbeamerfont{headline institute}{size=\large}
+\setbeamerfont{block title}{size=\large, series=\bfseries}
+\setbeamerfont{block body}{size=\normalsize}
+
+% ── Itemize markers ──────────────────────────────────────────────────────────
+\setbeamertemplate{itemize item}{\color{ISURed}\raisebox{0.12ex}{\vrule width 0.7ex height 0.7ex}}
+\setbeamertemplate{itemize subitem}{\color{ISUGold}\raisebox{0.12ex}{\vrule width 0.5ex height 0.5ex}}
+\setbeamertemplate{navigation symbols}{}
+
+% ── Headline (header bar) ────────────────────────────────────────────────────
+\setbeamertemplate{headline}{%
+  \leavevmode
+  \begin{beamercolorbox}[wd=\paperwidth, ht=10cm, dp=0cm]{headline}
+    \begin{tikzpicture}[remember picture, overlay]
+      % Red background already set by beamercolorbox
+      % University name - left side
+      \node[anchor=west, white, font=\fontsize{42}{50}\selectfont\bfseries]
+        at ([xshift=2cm, yshift=-2.5cm] current page.north west)
+        {IOWA STATE UNIVERSITY};
+      % Department - below university
+      \node[anchor=west, ISUGold, font=\fontsize{24}{30}\selectfont]
+        at ([xshift=2cm, yshift=-4.2cm] current page.north west)
+        {Department of Chemical and Biological Engineering};
+      % Event - right side
+      \node[anchor=east, white, font=\fontsize{22}{28}\selectfont]
+        at ([xshift=-2cm, yshift=-2.5cm] current page.north east)
+        {Honors Poster Symposium};
+      \node[anchor=east, ISUGold, font=\fontsize{22}{28}\selectfont]
+        at ([xshift=-2cm, yshift=-4.2cm] current page.north east)
+        {May 6, 2026};
+      % Gold accent line at bottom of header
+      \fill[ISUGold] ([yshift=-9.4cm] current page.north west)
+        rectangle ([yshift=-9.7cm] current page.north east);
+      % Title - centered
+      \node[anchor=center, white, text width=0.85\paperwidth, align=center,
+            font=\fontsize{52}{60}\selectfont\bfseries]
+        at ([yshift=-6.5cm] current page.north)
+        {\inserttitle};
+      % Author line
+      \node[anchor=center, white, font=\fontsize{28}{34}\selectfont]
+        at ([yshift=-8.5cm] current page.north)
+        {\insertauthor};
+    \end{tikzpicture}
+  \end{beamercolorbox}
+}
+
+% ── Block styling ────────────────────────────────────────────────────────────
+\setbeamertemplate{block begin}{%
+  \vskip0.5ex
+  \begin{beamercolorbox}[ht=2.8ex, dp=1ex, leftskip=1em, rightskip=1em,
+                          rounded=true, shadow=false]{block title}%
+    \usebeamerfont{block title}\insertblocktitle
+  \end{beamercolorbox}%
+  \vskip-0.4ex
+  \begin{beamercolorbox}[leftskip=1em, rightskip=1em, vmode,
+                          rounded=true, shadow=false]{block body}%
+    \vskip0.6ex
+    \usebeamerfont{block body}%
+}
+\setbeamertemplate{block end}{%
+    \vskip0.4ex
+  \end{beamercolorbox}
+  \vskip0.8ex
+}
+
+% ── Alert block styling ──────────────────────────────────────────────────────
+\setbeamertemplate{block alerted begin}{%
+  \vskip0.5ex
+  \begin{beamercolorbox}[ht=2.8ex, dp=1ex, leftskip=1em, rightskip=1em,
+                          rounded=true, shadow=false]{block alerted title}%
+    \usebeamerfont{block title}\insertblocktitle
+  \end{beamercolorbox}%
+  \vskip-0.4ex
+  \begin{beamercolorbox}[leftskip=1em, rightskip=1em, vmode,
+                          rounded=true, shadow=false]{block alerted body}%
+    \vskip0.6ex
+    \usebeamerfont{block body}%
+}
+\setbeamertemplate{block alerted end}{%
+    \vskip0.4ex
+  \end{beamercolorbox}
+  \vskip0.8ex
+}
+
+% ── Footer ───────────────────────────────────────────────────────────────────
+\setbeamertemplate{footline}{%
+  \leavevmode
+  \begin{beamercolorbox}[wd=\paperwidth, ht=0.6cm]{headline}
+  \end{beamercolorbox}
+}
+
+\endinput
