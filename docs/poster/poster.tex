@@ -17,7 +17,7 @@
 \usepackage{ragged2e}
 \usepackage{qrcode}
 \usepackage{caption}
-\captionsetup{font=small, labelfont=bf, labelsep=period}
+\captionsetup{font=small, labelfont=bf, labelsep=period, skip=0.35em}
 
 % ── Metadata ─────────────────────────────────────────────────────────────────
 \title{Colocalization-Confirmed Transcriptome-Wide Association Study\\
@@ -26,13 +26,14 @@ of Ankylosing Spondylitis to Prioritize Tissue-Specific Drug Targets}
 \date{}
 
 % ── Document ─────────────────────────────────────────────────────────────────
-\setlength{\belowcaptionskip}{-8pt}
+\setlength{\belowcaptionskip}{0.25em}
+\setlength{\columnsep}{1.2cm}
 \begin{document}
 \begin{frame}[t]
-\begin{columns}[t]
+\begin{columns}[t,onlytextwidth]
 
 % ══════════════════════════════════════════════════════════════════════════════
-% COLUMN 1 (left)
+% COLUMN 1 (left): Introduction, Key Question, Methods, Conclusion, Future
 % ══════════════════════════════════════════════════════════════════════════════
 \begin{column}{0.32\textwidth}
 
@@ -104,98 +105,6 @@ palindromic removed $\to$ 109,893 harmonized.
 Transverse, Small Intestine, Muscle Skeletal, Adipose Subcutaneous.
 \end{block}
 
-\end{column}
-
-% ══════════════════════════════════════════════════════════════════════════════
-% COLUMN 2 (center)
-% ══════════════════════════════════════════════════════════════════════════════
-\begin{column}{0.34\textwidth}
-
-% ── TWAS Results ─────────────────────────────────────────────────────────────
-\begin{block}{TWAS Results}
-\justifying
-S-PrediXcan tested \textbf{2,316 gene-tissue pairs} across 8 GTEx v8
-tissues. After Benjamini--Hochberg FDR correction ($\alpha = 0.05$),
-\textbf{248 significant associations} were identified, spanning genes on
-multiple chromosomes.
-
-\vskip0.3em
-\begin{center}
-\includegraphics[width=0.90\linewidth]{figures/manhattan_twas.png}
-\captionof{figure}{Manhattan-style plot of TWAS $-\!\log_{10}(p)$ across 8
-tissues. Top gene symbols annotated. Dashed line: FDR $< 0.05$.}
-\end{center}
-
-\vskip0.2em
-\begin{center}
-\includegraphics[width=0.50\linewidth]{figures/qqplot_twas.png}
-\captionof{figure}{QQ-plot: departure from null consistent with
-polygenic architecture. Grey band: 95\% CI.}
-\end{center}
-\end{block}
-
-% ── Colocalization Results ───────────────────────────────────────────────────
-\begin{block}{Colocalization Results}
-\justifying
-Of the 248 TWAS hits, Bayesian colocalization (coloc.abf) identified
-\textbf{35 gene-tissue pairs (18 unique genes)} with PP4 $\geq$ 0.70,
-confirming a shared causal variant between GWAS and eQTL signals.
-
-\vskip0.3em
-\begin{center}
-\includegraphics[width=0.55\linewidth]{figures/coloc_pp4_vs_pp3pp4.png}
-\captionof{figure}{PP4 vs.\ locus power (PP3+PP4). Upper-right:
-colocalization-confirmed hits.}
-\end{center}
-\end{block}
-
-\end{column}
-
-% ══════════════════════════════════════════════════════════════════════════════
-% COLUMN 3 (right)
-% ══════════════════════════════════════════════════════════════════════════════
-\begin{column}{0.32\textwidth}
-
-% ── Top Colocalized Genes ────────────────────────────────────────────────────
-\begin{block}{Top Colocalized Genes}
-\begin{center}
-\includegraphics[width=0.85\linewidth]{figures/coloc_pp4_barplot.png}
-\captionof{figure}{All 35 coloc-confirmed gene-tissue pairs ranked by PP4.
-Color indicates tissue. Dashed line: PP4 = 0.70.}
-\end{center}
-
-\vskip0.2em
-\footnotesize
-\begin{center}
-\begin{tabular}{@{}llccc@{}}
-\toprule
-\textbf{Gene} & \textbf{Tissue} & \textbf{PP4} & \textbf{$z$} & \textbf{FDR $p$} \\
-\midrule
-\textit{ERAP1}   & Whole Blood      & 0.999 & 13.28  & 2.5e-38 \\
-\textit{GPR25}   & Whole Blood      & 0.997 & $-$7.03  & 6.0e-11 \\
-\textit{NPIPB7}  & Whole Blood      & 0.993 & $-$5.16  & 5.9e-06 \\
-\textit{CCDC116} & Spleen           & 0.988 & $-$5.16  & 5.9e-06 \\
-\textit{UBE2L3}  & Whole Blood      & 0.983 & 5.32   & 2.5e-06 \\
-\bottomrule
-\end{tabular}
-\end{center}
-\end{block}
-
-% ── Discussion ───────────────────────────────────────────────────────────────
-\begin{block}{Discussion}
-\justifying
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item \textit{ERAP1} (MHC-I antigen processing) is a known AS gene,
-    validating our pipeline. Colocalizes in Whole Blood and Small Intestine.
-  \item Novel candidates \textit{GPR25}, \textit{CCDC116}, \textit{NPIPB7}
-    warrant experimental follow-up as tissue-specific drug targets.
-  \item \textit{CARD9} and \textit{FAS} implicate innate immune and
-    apoptotic pathways beyond HLA-B27.
-  \item Colocalization reduced 248 TWAS hits to 35 confirmed pairs,
-    filtering LD-driven false positives.
-\end{itemize}
-\end{block}
-
 % ── Conclusion ───────────────────────────────────────────────────────────────
 \begin{block}{Conclusion}
 \justifying
@@ -213,17 +122,110 @@ prioritizing tissue-specific targets for therapeutic development.
 \end{itemize}
 \end{alertblock}
 
+\end{column}
+
+% ══════════════════════════════════════════════════════════════════════════════
+% COLUMN 2 (center): TWAS Results, Colocalization Results, Discussion
+% ══════════════════════════════════════════════════════════════════════════════
+\begin{column}{0.34\textwidth}
+
+% ── TWAS Results ─────────────────────────────────────────────────────────────
+\begin{block}{TWAS Results}
+\justifying
+S-PrediXcan tested \textbf{2,316 gene-tissue pairs} across 8 GTEx v8
+tissues. After Benjamini--Hochberg FDR correction ($\alpha = 0.05$),
+\textbf{248 significant associations} were identified, spanning genes on
+multiple chromosomes.
+
+\vskip0.3em
+\begin{center}
+\includegraphics[width=0.92\linewidth]{figures/manhattan_twas.png}
+\captionof{figure}{Manhattan-style plot of TWAS $-\!\log_{10}(p)$ across 8
+tissues. Top gene symbols annotated. Dashed line: FDR $< 0.05$.}
+\end{center}
+
+\begin{center}
+\includegraphics[width=0.55\linewidth]{figures/qqplot_twas.png}
+\captionof{figure}{QQ-plot: departure from null consistent with
+polygenic architecture. Grey band: 95\% CI.}
+\end{center}
+\end{block}
+
+% ── Colocalization Results ───────────────────────────────────────────────────
+\begin{block}{Colocalization Results}
+\justifying
+Of the 248 TWAS hits, Bayesian colocalization (coloc.abf) identified
+\textbf{35 gene-tissue pairs (18 unique genes)} with PP4 $\geq$ 0.70,
+confirming a shared causal variant between GWAS and eQTL signals.
+
+\vskip0.3em
+\begin{center}
+\includegraphics[width=0.60\linewidth]{figures/coloc_pp4_vs_pp3pp4.png}
+\captionof{figure}{PP4 vs.\ locus power (PP3+PP4). Upper-right:
+colocalization-confirmed hits.}
+\end{center}
+\end{block}
+
+% ── Discussion ───────────────────────────────────────────────────────────────
+\begin{block}{Discussion}
+\justifying
+\begin{itemize}\setlength{\itemsep}{1pt}
+  \item \textit{ERAP1} (MHC-I antigen processing) is a known AS gene,
+    validating our pipeline. Colocalizes in Whole Blood and Small Intestine.
+  \item Novel candidates \textit{GPR25}, \textit{CCDC116}, \textit{NPIPB7}
+    warrant experimental follow-up as tissue-specific drug targets.
+  \item \textit{CARD9} and \textit{FAS} implicate innate immune and
+    apoptotic pathways beyond HLA-B27.
+  \item Colocalization reduced 248 TWAS hits to 35 confirmed pairs,
+    filtering LD-driven false positives.
+\end{itemize}
+\end{block}
+
+\end{column}
+
+% ══════════════════════════════════════════════════════════════════════════════
+% COLUMN 3 (right): Top Colocalized Genes, Acknowledgements & Code
+% ══════════════════════════════════════════════════════════════════════════════
+\begin{column}{0.32\textwidth}
+
+% ── Top Colocalized Genes ────────────────────────────────────────────────────
+\begin{block}{Top Colocalized Genes}
+\begin{center}
+\includegraphics[width=0.92\linewidth]{figures/coloc_pp4_barplot.png}
+\captionof{figure}{All 35 coloc-confirmed gene-tissue pairs ranked by PP4.
+Color indicates tissue. Dashed line: PP4 = 0.70.}
+\end{center}
+
+\vskip0.3em
+\footnotesize
+\begin{center}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+\textbf{Gene} & \textbf{Tissue} & \textbf{PP4} & \textbf{$z$} & \textbf{FDR $p$} \\
+\midrule
+\textit{ERAP1}   & Whole Blood      & 0.999 & 13.28  & 2.5e-38 \\
+\textit{GPR25}   & Whole Blood      & 0.997 & $-$7.03  & 6.0e-11 \\
+\textit{NPIPB7}  & Whole Blood      & 0.993 & $-$5.16  & 5.9e-06 \\
+\textit{CCDC116} & Spleen           & 0.988 & $-$5.16  & 5.9e-06 \\
+\textit{UBE2L3}  & Whole Blood      & 0.983 & 5.32   & 2.5e-06 \\
+\textit{CARD9}   & Whole Blood      & 0.974 & 4.94   & 1.7e-05 \\
+\textit{FAS}     & Colon Sigmoid    & 0.973 & 4.42   & 1.9e-04 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{block}
+
 % ── Acknowledgements + QR ────────────────────────────────────────────────────
 \begin{block}{Acknowledgements \& Code}
-\begin{columns}[T]
-\begin{column}{0.70\textwidth}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.68\textwidth}
 \footnotesize
 \justifying
 Thanks to \textbf{Dr.\ Ratul Chowdhury} for mentorship. GWAS data from
 NHGRI-EBI GWAS Catalog (GCST005529). Expression models from GTEx
 Consortium~(v8). S-PrediXcan and coloc.abf software authors.
 \end{column}
-\begin{column}{0.27\textwidth}
+\begin{column}{0.28\textwidth}
 \centering
 \qrcode[height=2.5cm]{https://github.com/yellepeddibk/as-twas-coloc}\\[0.2em]
 \scriptsize\texttt{github.com/yellepeddibk/\\as-twas-coloc}
