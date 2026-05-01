@@ -1,4 +1,4 @@
-% poster.tex -- ISU Honors Poster Symposium (v2 rebalanced layout)
+% poster.tex -- Undergraduate Research
 % AS-TWAS-COLOC: Colocalization-Confirmed TWAS of Ankylosing Spondylitis
 % 48" x 36" landscape, beamerposter
 % Build: latexmk -pdf poster.tex  (or: make poster)
@@ -186,8 +186,8 @@ validation in AS.
 % ── Future Directions ────────────────────────────────────────────────────────
 \begin{alertblock}{Future Directions}
 \begin{itemize}\setlength{\itemsep}{2pt}
-  \item Fine-mapping with SuSiE for credible causal variants
-  \item Validation in independent AS cohorts
+  \item Weighted protein interaction network of prioritized genes via Seq2Bind [1,2]
+  \item Fine-mapping (SuSiE) and validation in independent AS cohorts
   \item Drug repurposing analysis for top targets
 \end{itemize}
 \end{alertblock}
@@ -202,13 +202,12 @@ validation in AS.
 % ── Top Colocalized Genes ────────────────────────────────────────────────────
 \begin{block}{Top Colocalized Genes}
 \begin{center}
-\includegraphics[width=0.78\linewidth,keepaspectratio]{figures/coloc_pp4_barplot.png}
+\hspace*{-6.5cm}\includegraphics[width=0.78\linewidth,keepaspectratio]{figures/coloc_pp4_barplot.png}
 \captionof{figure}{All 35 coloc-confirmed gene-tissue pairs ranked by PP4.
 Color indicates tissue. Dashed line: PP4 = 0.70.}
 \end{center}
 
 \vskip0.15em
-\small
 \begin{center}
 \begin{tabular}{@{}llccc@{}}
 \toprule
@@ -226,9 +225,18 @@ Color indicates tissue. Dashed line: PP4 = 0.70.}
 \end{center}
 \end{block}
 
+% ── Selected References ──────────────────────────────────────────────────────
+\begin{block}{Selected References}
+\begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{0pt}\setlength{\leftskip}{-1.2em}
+  \item Ma X, Dey S, et al. Seq2Bind webserver. \textit{NAR Genom Bioinform}. 2025;7:lqaf154.
+  \item Dey S, Chowdhury R. Twin Peaks. \textit{arXiv}:2509.22950. 2025.
+  \item Barbeira AN, et al. S-PrediXcan. \textit{Nat Commun}. 2018;9:1825.
+  \item Giambartolomei C, et al. coloc.abf. \textit{PLoS Genet}. 2014;10:e1004383.
+\end{enumerate}
+\end{block}
+
 % ── Acknowledgements + QR ────────────────────────────────────────────────────
 \begin{block}{Acknowledgements \& Code}
-\small
 \justifying
 Thanks to \textbf{Dr.\ Ratul Chowdhury} for mentorship. GWAS data from
 NHGRI-EBI GWAS Catalog (GCST005529). Expression models from GTEx
@@ -236,8 +244,8 @@ Consortium~(v8). S-PrediXcan and coloc.abf software authors.
 
 \vskip0.5em
 \begin{center}
-\qrcode[height=2.2cm]{https://github.com/yellepeddibk/as-twas-coloc}\\[0.15em]
-\scriptsize\texttt{github.com/yellepeddibk/as-twas-coloc}
+\qrcode[height=5cm]{https://github.com/yellepeddibk/as-twas-coloc}\\[1em]
+\texttt{github.com/yellepeddibk/as-twas-coloc}
 \end{center}
 \end{block}
 
