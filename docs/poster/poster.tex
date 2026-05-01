@@ -77,25 +77,27 @@ colocalizes} with AS risk variants, and in which tissues?
 \begin{tikzpicture}[
   scale=1.0,
   transform shape,
-  node distance=0.45cm and 0.4cm,
+  node distance=0.5cm and 0.4cm,
   box/.style={rectangle, rounded corners=3pt, draw=ISURed, fill=ISURed!8,
               text width=14em, minimum height=2em, align=center,
               font=\footnotesize\bfseries},
   data/.style={rectangle, rounded corners=3pt, draw=ISUGold, fill=ISUGold!15,
-               text width=10em, minimum height=1.8em, align=center,
+               text width=9em, minimum height=1.8em, align=center,
                font=\footnotesize},
   arrow/.style={-{Stealth[length=2.5mm]}, thick, ISUDark}
 ]
   \node[data] (gwas) {AS GWAS (GCST005529)\\$N$=25,764};
-  \node[data, right=2.0cm of gwas] (gtex) {GTEx v8 Mashr Models\\8 tissues};
-  \node[box, below=0.42cm of $(gwas)!0.5!(gtex)$] (harm) {1. GWAS QC \& Harmonization};
+  \node[data, right=1.6cm of gwas] (gtex) {GTEx v8 Mashr Models\\8 tissues};
+  \node[box, below=2cm of $(gwas)!0.5!(gtex)$] (harm) {1. GWAS QC \& Harmonization};
   \node[box, below=of harm] (twas) {2. S-PrediXcan TWAS};
   \node[box, below=of twas] (fdr) {3. FDR Correction (BH, $\alpha$=0.05)};
   \node[box, below=of fdr] (coloc) {4. Colocalization (PP4 $\geq$ 0.70)};
   \node[box, below=of coloc] (out) {5. Prioritized Gene List};
 
-  \draw[arrow] (gwas.south) -- ++(0,-0.2) -| (harm.north);
-  \draw[arrow] (gtex.south) -- ++(0,-0.2) -| (harm.north);
+  \coordinate (junc) at ($(harm.north)+(0,0.5)$);
+  \draw[thick, ISUDark] (gwas.south) |- (junc);
+  \draw[thick, ISUDark] (gtex.south) |- (junc);
+  \draw[arrow] (junc) -- (harm.north);
   \draw[arrow] (harm) -- (twas);
   \draw[arrow] (twas) -- (fdr);
   \draw[arrow] (fdr) -- (coloc);
@@ -116,14 +118,28 @@ Transverse, Small Intestine, Muscle Skeletal, Adipose Subcutaneous.
 \justifying
 \begin{itemize}\setlength{\itemsep}{2pt}
   \item \textit{ERAP1} (MHC-I antigen processing) is a known AS gene,
-    validating our pipeline. Colocalizes in Whole Blood and Small Intestine.
+    validating our pipeline, and colocalizes in Whole Blood and Small Intestine.
   \item Novel candidates \textit{GPR25}, \textit{CCDC116}, \textit{NPIPB7}
     warrant experimental follow-up as tissue-specific drug targets.
   \item \textit{CARD9} and \textit{FAS} implicate innate immune and
     apoptotic pathways beyond HLA-B27.
   \item Colocalization reduced 248 TWAS hits to 35 confirmed pairs,
     filtering LD-driven false positives.
+  \item \textit{UBE2L3} (ubiquitin-proteasome pathway) may interact with
+    \textit{ERAP1} in antigen processing, suggesting a shared mechanistic axis.
+  \item Whole Blood was the most frequently enriched tissue (11 of 35 pairs),
+    consistent with AS being a systemic immune-mediated disease.
 \end{itemize}
+\end{block}
+
+% ── Predicted Protein Interaction Network ───────────────────────────────────
+\begin{block}{Predicted Protein Interaction Network}
+\begin{center}
+\hspace*{-10cm}\includegraphics[width=1.5\linewidth]{figures/string_network.png}
+\captionof{figure}{STRING-DB v12 subgraph of 16 prioritized proteins
+(score $\geq 0.400$). Edges: \textit{CARD9}--\textit{ERAP1},
+\textit{ZNF646}--\textit{ZNF668}, \textit{PRSS53}--\textit{ZNF646}/\textit{ZNF668}.}
+\end{center}
 \end{block}
 
 \end{column}
@@ -136,7 +152,7 @@ Transverse, Small Intestine, Muscle Skeletal, Adipose Subcutaneous.
 % ── TWAS Results ─────────────────────────────────────────────────────────────
 \begin{block}{TWAS Results}
 \justifying
-S-PrediXcan tested \textbf{2,316 gene-tissue pairs} across 8 GTEx v8
+S-PrediXcan tested \textbf{2,313 gene-tissue pairs} across 8 GTEx v8
 tissues. After Benjamini--Hochberg FDR correction ($\alpha = 0.05$),
 \textbf{248 significant associations} were identified, spanning genes on
 multiple chromosomes.
@@ -186,7 +202,7 @@ validation in AS.
 % ── Future Directions ────────────────────────────────────────────────────────
 \begin{alertblock}{Future Directions}
 \begin{itemize}\setlength{\itemsep}{2pt}
-  \item Weighted protein interaction network of prioritized genes via Seq2Bind [1,2]
+  \item Residue-level binding-interface dissection of top STRING-predicted interactions via Seq2Bind [1]
   \item Fine-mapping (SuSiE) and validation in independent AS cohorts
   \item Drug repurposing analysis for top targets
 \end{itemize}
@@ -229,22 +245,25 @@ Color indicates tissue. Dashed line: PP4 = 0.70.}
 \begin{block}{Selected References}
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{0pt}\setlength{\leftskip}{-1.2em}
   \item Ma X, Dey S, et al. Seq2Bind webserver. \textit{NAR Genom Bioinform}. 2025;7:lqaf154.
-  \item Dey S, Chowdhury R. Twin Peaks. \textit{arXiv}:2509.22950. 2025.
+  \item Ellinghaus D, et al. Multi-disease inflammatory GWAS meta-analysis. \textit{Nat Genet}. 2016;48:510--518.
+  \item GTEx Consortium. Regulatory effects across human tissues (GTEx atlas). \textit{Science}. 2020;369:1318--1330.
   \item Barbeira AN, et al. S-PrediXcan. \textit{Nat Commun}. 2018;9:1825.
   \item Giambartolomei C, et al. coloc.abf. \textit{PLoS Genet}. 2014;10:e1004383.
+  \item Szklarczyk D, et al. STRING v12. \textit{Nucleic Acids Res}. 2023;51:D685--D699.
 \end{enumerate}
 \end{block}
 
 % ── Acknowledgements + QR ────────────────────────────────────────────────────
 \begin{block}{Acknowledgements \& Code}
 \justifying
-Thanks to \textbf{Dr.\ Ratul Chowdhury} for mentorship. GWAS data from
-NHGRI-EBI GWAS Catalog (GCST005529). Expression models from GTEx
-Consortium~(v8). S-PrediXcan and coloc.abf software authors.
+We thank \textbf{Dr.\ Ratul Chowdhury} for mentorship and project guidance.
+AS GWAS summary statistics were obtained from the NHGRI-EBI GWAS Catalog
+(GCST005529; Ellinghaus et al.\ 2016), with expression models from GTEx v8.
+Analyses used S-PrediXcan, coloc.abf, and STRING-DB v12 in Python and R.
 
-\vskip0.5em
+\vskip0.2em
 \begin{center}
-\qrcode[height=5cm]{https://github.com/yellepeddibk/as-twas-coloc}\\[1em]
+\qrcode[height=4.5cm]{https://github.com/yellepeddibk/as-twas-coloc}\\[0.7em]
 \texttt{github.com/yellepeddibk/as-twas-coloc}
 \end{center}
 \end{block}

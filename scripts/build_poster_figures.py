@@ -265,16 +265,26 @@ def build_pp4_scatter():
     # Quadrant shading
     ax.fill_between([0.80, 1.05], 0.70, 1.05, alpha=0.06, color=ISU_RED, zorder=0)
 
-    # Label top 10 hits
-    top_hits = hits.nlargest(10, "PP4")
-    for _, row in top_hits.iterrows():
+    # Label top 6 unique genes -- all cluster in the upper-right corner, so
+    # park the labels in a vertically spaced column in the empty mid-left
+    # region with leader lines back to each point. Sorting by PP4 keeps line
+    # order matched to point order, eliminating crossings.
+    top_hits = (hits.sort_values("PP4", ascending=False)
+                .drop_duplicates("gene_name")
+                .head(6)
+                .reset_index(drop=True))
+    label_x = 0.42
+    label_ys = [0.78, 0.66, 0.54, 0.42, 0.30, 0.18]
+    for i, row in top_hits.iterrows():
         ax.annotate(
             row["gene_name"],
-            (row["PP3_PP4"], row["PP4"]),
-            textcoords="offset points",
-            xytext=(8, 4),
-            fontsize=9, fontstyle="italic",
-            arrowprops=dict(arrowstyle="-", color="gray", lw=0.5),
+            xy=(row["PP3_PP4"], row["PP4"]),
+            xytext=(label_x, label_ys[i]),
+            textcoords="data",
+            fontsize=10, fontstyle="italic", ha="right", va="center",
+            arrowprops=dict(arrowstyle="-", color="gray", lw=0.6,
+                            shrinkA=2, shrinkB=3),
+            zorder=4,
         )
 
     ax.set_xlabel("PP3 + PP4 (Locus Power)")
@@ -297,6 +307,12 @@ def main():
     build_coloc_barplot()
     build_pp4_scatter()
     print("\nAll poster figures generated.")
+
+
+def _main_scatter_only():
+    """Rebuild only the PP4 scatter figure."""
+    _poster_style()
+    build_pp4_scatter()
 
 
 if __name__ == "__main__":
