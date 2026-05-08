@@ -7,7 +7,7 @@ Each pipeline run saves a manifest to results/manifests/ containing:
 - timestamp
 - git commit hash (if available)
 - config snapshot
-- tool version placeholders
+- Python and external tool versions
 - input file paths and checksum placeholders
 - decision thresholds
 - coloc priors
@@ -43,6 +43,21 @@ def _git_commit() -> Optional[str]:
         return None
 
 
+def _git_commit_for_repo(repo_path: str | Path) -> Optional[str]:
+    """Return the git commit hash for a specific repository path."""
+    repo_path = Path(repo_path)
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(repo_path), "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return result.stdout.strip()
+    except Exception:
+        return None
+
+
 def _file_md5(path: str | Path) -> Optional[str]:
     """Compute MD5 checksum of a file; return None if file not found."""
     path = Path(path)
@@ -53,6 +68,77 @@ def _file_md5(path: str | Path) -> Optional[str]:
         for chunk in iter(lambda: fh.read(8192), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def _command_output(args: List[str]) -> Optional[str]:
+    """Run a command and return stripped stdout or stderr, or None on failure."""
+    try:
+        result = subprocess.run(
+            args,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except Exception:
+        return None
+
+    stdout = result.stdout.strip()
+    stderr = result.stderr.strip()
+    return stdout or stderr or None
+
+
+def _resolve_path(path: str | Path, cfg: Dict[str, Any]) -> Path:
+    """Resolve a repo-relative path using cfg['_base_dir'] when available."""
+    path = Path(path)
+    if path.is_absolute():
+        return path
+
+    base_dir = Path(cfg.get("_base_dir", ".")).resolve()
+    return base_dir / path
+
+
+def _find_git_root(start_path: str | Path) -> Optional[Path]:
+    """Walk upward from a path until a git root is found."""
+    start_path = Path(start_path).resolve()
+    candidates = [start_path] + list(start_path.parents)
+    for candidate in candidates:
+        if (candidate / ".git").exists():
+            return candidate
+    return None
+
+
+def _metaxcan_version(cfg: Dict[str, Any]) -> Optional[str]:
+    """Return a MetaXcan/SPrediXcan repository commit if available."""
+    sp_cfg = cfg.get("spredixcan", {})
+    script_path = _resolve_path(
+        sp_cfg.get("script", "external/MetaXcan/software/SPrediXcan.py"),
+        cfg,
+    )
+    git_root = _find_git_root(script_path.parent)
+    if git_root is None:
+        return None
+
+    commit = _git_commit_for_repo(git_root)
+    if commit is None:
+        return None
+
+    return f"git:{commit[:7]}"
+
+
+def _rscript_version() -> Optional[str]:
+    """Return the installed Rscript version string, or None."""
+    output = _command_output(["Rscript", "--version"])
+    if output is None:
+        return None
+    return output.splitlines()[0].strip()
+
+
+def _r_package_version(package: str) -> Optional[str]:
+    """Return the installed R package version, or None if unavailable."""
+    output = _command_output(
+        ["Rscript", "-e", f"cat(as.character(packageVersion('{package}')))"],
+    )
+    return output.strip() if output else None
 
 
 def build_manifest(
@@ -95,10 +181,9 @@ def build_manifest(
             "pandas": _try_version("pandas"),
             "scipy": _try_version("scipy"),
             "statsmodels": _try_version("statsmodels"),
-            # External tools are not installed in CI; record as None
-            "MetaXcan/SPrediXcan": None,  # TODO: record after installation
-            "R": None,                     # TODO: record R version
-            "coloc_R_package": None,       # TODO: record coloc package version
+            "MetaXcan/SPrediXcan": _metaxcan_version(cfg),
+            "R": _rscript_version(),
+            "coloc_R_package": _r_package_version("coloc"),
         },
         "input_files": {str(f): str(f) for f in (input_files or [])},
         "input_checksums": checksums,
