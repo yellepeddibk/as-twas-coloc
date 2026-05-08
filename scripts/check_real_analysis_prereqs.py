@@ -2,12 +2,12 @@
 """
 check_real_analysis_prereqs.py
 ------------------------------
-Validate prerequisites for real TWAS + COLOC poster analysis.
+Validate prerequisites for configured real TWAS + COLOC analyses.
 
 Checks:
 - MetaXcan script present
 - Rscript available
-- GTEx model DB + covariance files for poster tissues
+- GTEx model DB + covariance files for configured tissues
 - GTEx eQTL directory exists and is non-empty
 """
 
@@ -34,6 +34,16 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Check prerequisites for real TWAS + COLOC runs")
     p.add_argument("--config", default="config/as.yaml", help="Config path")
     p.add_argument("--base-dir", default=".", help="Repository root")
+    tissue_group = p.add_mutually_exclusive_group()
+    tissue_group.add_argument(
+        "--tissues",
+        help="Comma-separated tissue override (default: use gtex.tissues from config)",
+    )
+    tissue_group.add_argument(
+        "--poster-tissues",
+        action="store_true",
+        help="Check only the poster tissue subset",
+    )
     return p.parse_args()
 
 
@@ -41,10 +51,29 @@ def _ok(flag: bool) -> str:
     return "OK" if flag else "MISSING"
 
 
+def _selected_tissues(cfg: dict, args: argparse.Namespace) -> list[str]:
+    """Resolve which tissues should be checked for required GTEx assets."""
+    if getattr(args, "tissues", None):
+        tissues = [t.strip() for t in args.tissues.split(",") if t.strip()]
+        if tissues:
+            return tissues
+
+    if getattr(args, "poster_tissues", False):
+        return POSTER_TISSUES
+
+    tissues = cfg.get("gtex", {}).get("tissues", [])
+    if not tissues:
+        raise ValueError("No tissues configured under gtex.tissues")
+    return tissues
+
+
 def main() -> int:
     args = parse_args()
     base_dir = Path(args.base_dir).resolve()
-    cfg = load_config(args.config)
+    config_path = Path(args.config)
+    if not config_path.is_absolute():
+        config_path = base_dir / config_path
+    cfg = load_config(config_path)
 
     gtex_cfg = cfg.get("gtex", {})
     sp_cfg = cfg.get("spredixcan", {})
@@ -63,6 +92,8 @@ def main() -> int:
     if not script_path.is_absolute():
         script_path = base_dir / script_path
 
+    tissues = _selected_tissues(cfg, args)
+
     rows = []
 
     rows.append(("MetaXcan script", str(script_path), script_path.exists()))
@@ -70,7 +101,7 @@ def main() -> int:
     rows.append(("GTEx model dir", str(model_dir), model_dir.exists()))
     rows.append(("GTEx eQTL dir", str(eqtl_dir), eqtl_dir.exists() and any(eqtl_dir.iterdir()) if eqtl_dir.exists() else False))
 
-    for tissue in POSTER_TISSUES:
+    for tissue in tissues:
         db_path = Path(model_pattern.format(model_dir=model_dir, tissue=tissue))
         cov_path = Path(cov_pattern.format(model_dir=model_dir, tissue=tissue))
         rows.append((f"Model DB ({tissue})", str(db_path), db_path.exists()))
@@ -80,6 +111,7 @@ def main() -> int:
 
     print("Real analysis prerequisite check")
     print("=" * 40)
+    print(f"Tissues checked: {', '.join(tissues)}")
     for name, target, ok in rows:
         print(f"[{_ok(ok):7}] {name}: {target}")
 

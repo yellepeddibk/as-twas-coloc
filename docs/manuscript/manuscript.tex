@@ -37,11 +37,11 @@
        of Ankylosing Spondylitis to Prioritize Tissue-Specific Drug Targets}
 
 \author{
-  \placeholder{Author Name}$^{1}$ \\
+      Bhargav Yellepeddi$^{1}$ \\
   \\
-  $^{1}$\placeholder{Department, Institution, City, Country} \\
+      $^{1}$Department and institution details to be finalized before submission \\
   \\
-  Correspondence: \placeholder{email@institution.edu}
+      Correspondence: to be finalized before submission
 }
 
 \date{\today}
@@ -60,17 +60,24 @@ largely uncharacterized.
 
 \textbf{Methods:}
 We integrated AS GWAS summary statistics with GTEx v8 gene expression
-prediction models across \placeholder{N} tissues using S-PrediXcan.
+prediction models across 8 tissues using S-PrediXcan.
 Global Benjamini-Hochberg false-discovery-rate correction was applied across
 all gene-tissue pairs. For FDR-significant hits, we performed Bayesian
 colocalization (coloc.abf) to distinguish genuinely co-localised GWAS and
 eQTL signals (PP4) from coincidental proximity (PP3).
 
 \textbf{Results:}
-\placeholder{Summary of real results — do not write until analyses are complete.}
+S-PrediXcan yielded 2,313 valid gene-tissue tests across the 8 configured
+GTEx v8 tissues. After global FDR correction, 248 gene-tissue associations
+were retained for follow-up. Bayesian colocalization identified 35
+gene-tissue pairs spanning 18 unique genes with PP4 $\geq 0.7$, with Whole
+Blood accounting for 11 of the 35 prioritized pairs. Top colocalized signals
+included \textit{ERAP1}, \textit{GPR25}, \textit{CARD9}, and \textit{FAS}.
 
 \textbf{Conclusions:}
-\placeholder{Conclusions — do not write until analyses are complete.}
+Combining TWAS with Bayesian colocalization reduced a broad set of
+transcriptome associations to a smaller, higher-confidence set of
+tissue-specific candidate genes for AS follow-up studies.
 
 \textbf{Keywords:}
 ankylosing spondylitis; TWAS; S-PrediXcan; colocalization; coloc; eQTL; GTEx; drug target prioritization
@@ -123,14 +130,14 @@ future AS GWAS or eQTL data.
 
 \subsection{GWAS Summary Statistics}
 
-\placeholder{Describe the AS GWAS dataset used: cohort, sample sizes,
-genotyping platform, imputation reference panel, and quality control filters.}
+Cohort-level genotyping, imputation-panel, and study-specific QC details
+should be reported directly from the source GWAS publication rather than
+inferred from downstream pipeline artifacts.
 
-We obtained AS GWAS summary statistics from \placeholder{source/citation}.
-The dataset comprised \placeholder{N\_cases} cases and \placeholder{N\_controls}
-controls (\placeholder{total N}).
-Summary statistics were originally reported on genome build
-\placeholder{hg19 or hg38}.
+We obtained AS GWAS summary statistics from the NHGRI-EBI GWAS Catalog
+accession GCST005529 \citep{Ellinghaus2016}. The dataset comprised 10,619
+cases and 15,145 controls (25,764 total samples). Summary statistics were
+originally reported on genome build hg19.
 
 \subsection{GWAS Harmonization}
 
@@ -139,7 +146,7 @@ Raw summary statistics were harmonized to hg38 using the following steps:
   \item Column names were standardized to a canonical schema
         (varID, chrom, pos, effect\_allele, non\_effect\_allele, beta, se, pvalue, N).
   \item Where applicable, coordinates were lifted from hg19 to hg38 using
-        \placeholder{liftover tool (e.g., pyliftover, CrossMap)}.
+        \texttt{pyliftover}.
   \item GTEx-style variant identifiers (varIDs) were constructed as
         \texttt{chr\{chrom\}\_\{pos\}\_\{ref\}\_\{alt\}\_b38}.
         This format is required for matching GWAS variants to GTEx
@@ -154,12 +161,13 @@ Raw summary statistics were harmonized to hg38 using the following steps:
 
 \subsection{Transcriptome-Wide Association Study}
 
-TWAS was performed using S-PrediXcan (MetaXcan v\placeholder{version})
+TWAS was performed using S-PrediXcan (MetaXcan repository commit
+\texttt{9b9f76b})
 \citep{Barbeira2018} with GTEx v8 mashr-based prediction models
 \citep{GTExConsortium2020,Barbeira2019}.
-\placeholder{N} tissues relevant to AS pathophysiology were analysed,
-including \placeholder{tissue list, e.g., Whole Blood, Colon Sigmoid,
-Small Intestine Terminal Ileum, Spleen, Muscle Skeletal, Lung}.
+Eight tissues relevant to AS pathophysiology were analysed: Whole Blood,
+Adipose Subcutaneous, Muscle Skeletal, Colon Sigmoid, Colon Transverse,
+Small Intestine Terminal Ileum, Spleen, and Lung.
 
 To control for multiple testing, Benjamini-Hochberg false-discovery rate
 (FDR) correction was applied globally across all gene-tissue pairs tested.
@@ -170,7 +178,7 @@ TWAS-significant hits.
 
 For each TWAS-significant gene-tissue pair, we performed Bayesian
 colocalization using the coloc.abf function from the \texttt{coloc} R
-package (v\placeholder{version}) \citep{Giambartolomei2014}.
+package (v5.2.3) \citep{Giambartolomei2014}.
 Regional GWAS summary statistics ($\pm$1\,Mb around the gene transcription
 start site) and tissue-matched GTEx v8 eQTL summary statistics were extracted.
 All SNPs within the region were included without pre-filtering by p-value,
@@ -190,9 +198,9 @@ Coloc results were interpreted using three complementary metrics:
         signal over distinct signals.
 \end{itemize}
 
-For loci with potential multiple independent signals
-(\placeholder{if applicable}), coloc.susie was applied as a sensitivity
-analysis \citep{Wallace2021}.
+For loci with potential multiple independent signals, coloc.susie was
+reserved as planned follow-up sensitivity analysis rather than part of the
+current reported run \citep{Wallace2021}.
 
 \subsection{Reproducibility}
 
@@ -200,6 +208,9 @@ All analyses were performed using a custom Python pipeline
 (available at \url{https://github.com/yellepeddibk/as-twas-coloc}).
 Each run saves a provenance manifest containing the pipeline version,
 git commit hash, configuration snapshot, coloc priors, and input file checksums.
+The current implementation also records Python package versions together with
+external tool identifiers, including the MetaXcan repository commit, R
+version, and coloc package version when available.
 Random seeds were fixed throughout.
 The pipeline runs in a lightweight mock mode for CI/CD validation without
 requiring external data.
@@ -207,28 +218,27 @@ requiring external data.
 % ── Results ──────────────────────────────────────────────────
 \section{Results}
 
-% NOTE: Do NOT fill in numerical results until real analyses are complete.
-% Replace all placeholders below with actual findings.
+% Numerical values below are limited to counts validated against current
+% result artifacts in this repository.
 
 \subsection{GWAS Harmonization and QC}
 
-\placeholder{
-Describe the harmonization outcome:
-- how many SNPs in raw GWAS
-- how many removed as palindromic
-- how many remained after QC
-- whether liftover was needed and how many SNPs were lost
-}
+The configured workflow ingested GWAS Catalog accession GCST005529 on hg19
+coordinates, lifted variants to hg38, standardized the summary-statistics
+schema, removed ambiguous palindromic SNPs by default, and generated a
+GTEx-compatible varID-indexed file for downstream TWAS. Final per-step SNP
+accounting should be reported from the production run artifacts alongside the
+submitted manuscript.
 
 \subsection{TWAS Identifies Association Signals Across Multiple Tissues}
 
-\placeholder{
-After global FDR correction across all N gene-tissue pairs tested,
-N significant gene-tissue associations were identified (FDR q < 0.05).
-These spanned N unique genes across N tissues.
-Provide summary of tissues with most hits.
-Insert Figure 2 (QQ-plot) and Figure 3 (Manhattan-style plot).
-}
+Across the eight configured GTEx tissues, S-PrediXcan returned 2,316 raw
+gene-tissue rows. Three rows had missing p-values and were excluded before
+multiple-testing correction, leaving 2,313 valid gene-tissue tests. Global
+Benjamini-Hochberg correction identified 248 significant associations
+($q < 0.05$), which were carried forward to colocalization. These signals
+spanned multiple chromosomes and tissues, with the strongest downstream
+colocalization support concentrated in Whole Blood.
 
 % Insert TWAS QQ-plot
 % \begin{figure}[htbp]
@@ -248,12 +258,14 @@ Insert Figure 2 (QQ-plot) and Figure 3 (Manhattan-style plot).
 
 \subsection{Colocalization Prioritizes a Subset of Genes with Shared Signals}
 
-\placeholder{
-Of the N TWAS-significant gene-tissue pairs, N underwent colocalization
-analysis. N gene-tissue pairs showed PP4 >= 0.7, indicating strong evidence
-for a shared causal variant between the AS GWAS signal and the tissue-specific
-eQTL. Insert Table 2 and Figure 4.
-}
+All 248 TWAS-significant gene-tissue pairs underwent colocalization analysis.
+Thirty-five gene-tissue pairs, representing 18 unique genes, met the primary
+shared-signal threshold of PP4 $\geq 0.7$. Whole Blood accounted for 11 of the
+35 prioritized pairs. The highest-confidence signals included
+\textit{ERAP1} in Whole Blood (PP4 = 0.999) and Small Intestine Terminal
+Ileum (PP4 = 0.999), \textit{GPR25} in Whole Blood (PP4 = 0.997),
+\textit{CARD9} in Whole Blood (PP4 = 0.974), and \textit{FAS} in Colon
+Sigmoid (PP4 = 0.973).
 
 % Insert coloc summary barplot
 % \begin{figure}[htbp]
@@ -269,13 +281,20 @@ eQTL. Insert Table 2 and Figure 4.
 % ── Discussion ───────────────────────────────────────────────
 \section{Discussion}
 
-\placeholder{
-Discuss the biological significance of top coloc-confirmed genes.
-Connect to known AS biology (e.g., IL-17/IL-23 axis, TNF, HLA region).
-Discuss tissue-specificity of findings (gut, blood, immune tissues).
-Compare to prior TWAS/coloc studies of AS or related diseases.
-Discuss drug target implications.
-}
+Several prioritized genes align with established AS biology while also
+highlighting follow-up candidates. \textit{ERAP1}, one of the best-supported
+AS loci, remained the top colocalized signal in both Whole Blood and Small
+Intestine Terminal Ileum, which supports the pipeline's ability to recover
+known disease biology. Additional prioritized genes such as \textit{CARD9},
+\textit{UBE2L3}, and \textit{FAS} implicate innate immune signaling,
+ubiquitin-mediated regulation, and apoptosis-related pathways with plausible
+roles in chronic inflammation. Whole Blood contributed the largest number of
+coloc-confirmed pairs, consistent with a systemic immune component, while the
+presence of intestine- and colon-associated signals argues against restricting
+interpretation to peripheral blood alone. Less-characterized candidates such
+as \textit{GPR25}, \textit{CCDC116}, and \textit{NPIPB7} are therefore best
+treated as prioritized hypotheses for replication, fine-mapping, and
+functional follow-up rather than definitive causal assignments.
 
 % ── Limitations ──────────────────────────────────────────────
 \section{Limitations}
@@ -288,24 +307,26 @@ Second, the application of coloc.abf assumes a single causal variant per locus;
 for loci with multiple independent signals, coloc.susie should be applied.
 Third, the GTEx sample sizes for individual tissues may be insufficient to
 detect eQTLs for all disease-relevant genes.
-\placeholder{Add additional limitations identified during analysis.}
+Fourth, three S-PrediXcan output rows had missing p-values and were excluded
+from global FDR correction, underscoring the need to report valid tested-pair
+counts directly rather than raw output row totals.
 
 % ── Future Work ──────────────────────────────────────────────
 \section{Future Work}
 
-\placeholder{
-Describe planned extensions:
-- Multi-ancestry TWAS using diverse reference panels
-- Integration of chromatin accessibility data (ATAC-seq) to prioritize regulatory mechanisms
-- Functional validation in AS patient-derived cell lines
-- Drug repurposing analysis using DGIdb or OpenTargets
-- coloc.susie for multi-causal loci
-}
+Planned next steps include multi-signal colocalization with coloc.susie,
+fine-mapping of top loci, replication in independent AS cohorts,
+integration of regulatory annotations such as chromatin accessibility, and
+drug-target mapping for the highest-confidence prioritized genes.
 
 % ── References ───────────────────────────────────────────────
 \section*{Acknowledgements}
 
-\placeholder{Acknowledge funding sources, advisors, and data providers.}
+We thank Dr.\ Ratul Chowdhury for mentorship and project guidance. AS GWAS
+summary statistics were obtained from the NHGRI-EBI GWAS Catalog
+(GCST005529), and tissue expression models were derived from GTEx v8.
+Funding and institutional support details should be finalized before
+submission.
 
 \bibliographystyle{unsrtnat}
 \bibliography{references}
