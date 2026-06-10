@@ -1,12 +1,9 @@
 {
   "name": "AS TWAS-COLOC Pipeline",
-  "image": "mcr.microsoft.com/devcontainers/python:3.11",
-  "features": {
-    "ghcr.io/rocker-org/devcontainer-features/r-apt:latest": {
-      "installRMarkdown": false
-    }
+  "build": {
+    "dockerfile": "Dockerfile"
   },
-  "postCreateCommand": "bash scripts/setup_cloud.sh",
+  "postCreateCommand": "bash scripts/setup_cloud.sh --software-only",
   "customizations": {
     "vscode": {
       "extensions": ["ms-python.python"]
