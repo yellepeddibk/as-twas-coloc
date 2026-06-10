@@ -1,0 +1,30 @@
+{
+  "_description": "Frozen publication counts derived from the real TWAS + COLOC run. The validator script compares live artifacts against these values to prevent silent drift.",
+  "gwas_harmonization": {
+    "input_snp_count": 123941,
+    "lifted_snp_count": 123925,
+    "palindromic_dropped_count": 14032,
+    "final_retained_snp_count": 109893
+  },
+  "twas": {
+    "raw_gene_tissue_rows": 2316,
+    "valid_gene_tissue_tests": 2313,
+    "fdr_significant_hits": 248,
+    "tissues": [
+      "Adipose_Subcutaneous",
+      "Colon_Sigmoid",
+      "Colon_Transverse",
+      "Lung",
+      "Muscle_Skeletal",
+      "Small_Intestine_Terminal_Ileum",
+      "Spleen",
+      "Whole_Blood"
+    ]
+  },
+  "coloc": {
+    "pp4_threshold": 0.7,
+    "coloc_confirmed_pairs": 35,
+    "unique_genes": 18,
+    "whole_blood_pairs": 11
+  }
+}
