@@ -211,6 +211,31 @@ python scripts/build_eqtl_regions_for_coloc.py \
 This writes region files under `data/interim/eqtl_regions/` and a build summary at
 `data/processed/qc/eqtl_region_build_summary.tsv`.
 
+### 7. Validate Frozen Publication Counts
+
+After producing real-run artifacts, lock the publication-facing numbers in
+[config/publication_counts.json](config/publication_counts.json) and run:
+
+```bash
+python scripts/validate_publication_counts.py \
+    --base-dir . \
+    --counts config/publication_counts.json \
+    --report-tsv results/manifests/publication_counts_report.tsv
+```
+
+The validator compares the live artifacts against the frozen JSON and exits
+non-zero on any drift. It checks:
+
+- GWAS harmonization SNP counts
+- Raw and valid TWAS gene-tissue test counts
+- FDR-significant TWAS hit count
+- Configured TWAS tissue list
+- Coloc-confirmed pair count, unique gene count, and Whole Blood pair count
+  (using the recorded `pp4_threshold`)
+
+Re-freeze the JSON only when the underlying real-run artifacts are intentionally
+regenerated, and update the manuscript counts in the same change.
+
 ---
 
 ## Prerequisites for Real Execution
