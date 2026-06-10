@@ -354,6 +354,7 @@ The manuscript scaffold lives at `docs/manuscript/manuscript.tex`. Update the Re
 - Each run saves a provenance manifest with timestamp, git commit hash, config snapshot, coloc priors, and input file checksums
 - Pipeline stages are independently rerunnable from their input files
 - Output file naming is deterministic
+- CI runs the full test suite plus guardrail checks that the publication-counts validator and real-analysis prereq checker keep their stable formats (see `.github/workflows/ci.yml`)
 
 ---
 
