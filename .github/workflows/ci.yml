@@ -41,3 +41,20 @@ jobs:
       - name: "Smoke test: run_pipeline.py --mock"
         run: |
           python scripts/run_pipeline.py --mock --base-dir /tmp/pipeline_smoke_test
+
+      - name: "Guardrail: validator scripts respond to --help"
+        run: |
+          python scripts/validate_publication_counts.py --help
+          python scripts/check_real_analysis_prereqs.py --help
+
+      - name: "Guardrail: real-analysis prereq report writes valid TSV (synthetic env)"
+        run: |
+          mkdir -p /tmp/prereq_check
+          python scripts/check_real_analysis_prereqs.py \
+            --config config/as.yaml \
+            --base-dir . \
+            --skip-r-package-check \
+            --report-tsv /tmp/prereq_check/real_analysis_prereqs.tsv || true
+          test -s /tmp/prereq_check/real_analysis_prereqs.tsv
+          head -n 1 /tmp/prereq_check/real_analysis_prereqs.tsv | \
+            grep -q "category	name	target	ok	required	detail"
