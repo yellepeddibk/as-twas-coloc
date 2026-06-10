@@ -155,13 +155,27 @@ This generates poster-ready intake artifacts:
 ### 5. Check Real TWAS + COLOC Prerequisites
 
 ```bash
-python scripts/check_real_analysis_prereqs.py --config config/as.yaml --base-dir .
+python scripts/check_real_analysis_prereqs.py \
+    --config config/as.yaml \
+    --base-dir . \
+    --report-tsv results/manifests/real_analysis_prereqs.tsv
 ```
 
-This prints a strict OK/MISSING checklist for the 3 poster tissues:
-- `Whole_Blood`
-- `Spleen`
-- `Small_Intestine_Terminal_Ileum`
+This prints a strict OK/MISSING checklist for all tissues configured in
+`config/as.yaml` and writes a machine-readable report when `--report-tsv` is
+provided. The checker validates:
+
+- AS GWAS input file
+- hg19 to hg38 liftover chain when liftover is configured
+- MetaXcan/S-PrediXcan script
+- Rscript plus required R packages (`coloc`, `jsonlite`)
+- GTEx model DB and covariance files for each configured tissue
+- GTEx eQTL summary file for each configured tissue
+
+Use `--poster-tissues` only when you intentionally want to check the smaller
+poster subset (`Whole_Blood`, `Spleen`, `Small_Intestine_Terminal_Ileum`).
+Use `--skip-r-package-check` on systems where R package installation is managed
+outside the active shell and you only want to check that `Rscript` is visible.
 
 ### 6. Provide Gene-Level eQTL Regions for Real COLOC
 
