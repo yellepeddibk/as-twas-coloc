@@ -94,6 +94,16 @@ as-twas-coloc/
 
 ## Setup Instructions
 
+### Dev Container / Codespaces (recommended)
+
+Open the repository in the included dev container if you want a reproducible software environment without bundling large datasets into the image. The container installs Python and R tooling, then runs the bootstrap script in software-only mode.
+
+If you later want to fetch the large GTEx reference assets into the workspace, run:
+
+```bash
+bash scripts/setup_cloud.sh --with-data
+```
+
 ### 1. Clone and install Python dependencies
 
 ```bash
@@ -103,6 +113,12 @@ pip install -r requirements.txt
 ```
 
 Python ≥ 3.10 is required. A virtual environment is recommended.
+
+If you are not using the dev container, you can still bootstrap the software stack with:
+
+```bash
+bash scripts/setup_cloud.sh --software-only
+```
 
 ### 2. Mock / Demo Run (no external data required)
 

@@ -5,6 +5,28 @@
 # ============================================================
 set -euo pipefail
 
+DOWNLOAD_DATA=false
+for arg in "$@"; do
+  case "$arg" in
+    --with-data)
+      DOWNLOAD_DATA=true
+      ;;
+    --software-only)
+      DOWNLOAD_DATA=false
+      ;;
+    -h|--help)
+      echo "Usage: bash scripts/setup_cloud.sh [--software-only|--with-data]"
+      echo "  --software-only  Install software dependencies only (default for devcontainer)"
+      echo "  --with-data      Also download GTEx models, eQTL resources, and liftover chain"
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $arg" >&2
+      exit 1
+      ;;
+  esac
+done
+
 TISSUES=(
   Whole_Blood
   Adipose_Subcutaneous
@@ -53,73 +75,81 @@ else
   echo "  MetaXcan already present, skipping."
 fi
 
-# ── 4. Download PredictDB mashr models ───────────────────────
-echo ""
-echo "[4/5] Downloading GTEx v8 mashr models..."
-MODEL_DIR="data/reference/gtex_v8_models"
-mkdir -p "$MODEL_DIR"
+if [[ "$DOWNLOAD_DATA" == true ]]; then
+  # ── 4. Download PredictDB mashr models ─────────────────────
+  echo ""
+  echo "[4/5] Downloading GTEx v8 mashr models..."
+  MODEL_DIR="data/reference/gtex_v8_models"
+  mkdir -p "$MODEL_DIR"
 
-# Check if models already exist (at least the 8 .db files we need)
-MODELS_PRESENT=0
-for tissue in "${TISSUES[@]}"; do
-  if [[ -f "${MODEL_DIR}/gtex_v8_mashr_${tissue}.db" ]]; then
-    MODELS_PRESENT=$((MODELS_PRESENT + 1))
-  fi
-done
-
-if [[ $MODELS_PRESENT -lt ${#TISSUES[@]} ]]; then
-  echo "  Downloading mashr models from Zenodo..."
-  curl -L -o /tmp/mashr_eqtl.tar "$MASHR_TAR_URL"
-  # Extract only the tissues we need (.db and .txt.gz covariance files)
+  # Check if models already exist (at least the 8 .db files we need)
+  MODELS_PRESENT=0
   for tissue in "${TISSUES[@]}"; do
-    tar -xf /tmp/mashr_eqtl.tar -C "$MODEL_DIR" --strip-components=1 \
-      "eqtl/mashr/mashr_${tissue}.db" \
-      "eqtl/mashr/mashr_${tissue}.txt.gz" 2>/dev/null || true
-    # Rename to match our naming convention if needed
-    if [[ -f "${MODEL_DIR}/mashr_${tissue}.db" ]] && [[ ! -f "${MODEL_DIR}/gtex_v8_mashr_${tissue}.db" ]]; then
-      mv "${MODEL_DIR}/mashr_${tissue}.db" "${MODEL_DIR}/gtex_v8_mashr_${tissue}.db"
-      mv "${MODEL_DIR}/mashr_${tissue}.txt.gz" "${MODEL_DIR}/gtex_v8_mashr_${tissue}.txt.gz"
+    if [[ -f "${MODEL_DIR}/gtex_v8_mashr_${tissue}.db" ]]; then
+      MODELS_PRESENT=$((MODELS_PRESENT + 1))
     fi
   done
-  rm -f /tmp/mashr_eqtl.tar
-  echo "  Models downloaded and extracted."
-else
-  echo "  All ${#TISSUES[@]} tissue models already present, skipping."
-fi
 
-# ── 5. Download GTEx v8 all-pairs eQTL files ────────────────
-echo ""
-echo "[5/5] Downloading GTEx v8 all-pairs eQTL files..."
-echo "  NOTE: Each file is ~4GB. Total ~32GB for 8 tissues."
-echo "  Downloads go to: data/reference/gtex_v8_eqtl/"
-EQTL_DIR="data/reference/gtex_v8_eqtl"
-mkdir -p "$EQTL_DIR"
-
-for tissue in "${TISSUES[@]}"; do
-  DEST="${EQTL_DIR}/${tissue}.allpairs.txt.gz"
-  if [[ -f "$DEST" ]]; then
-    echo "  ${tissue}.allpairs.txt.gz already exists, skipping."
+  if [[ $MODELS_PRESENT -lt ${#TISSUES[@]} ]]; then
+    echo "  Downloading mashr models from Zenodo..."
+    curl -L -o /tmp/mashr_eqtl.tar "$MASHR_TAR_URL"
+    # Extract only the tissues we need (.db and .txt.gz covariance files)
+    for tissue in "${TISSUES[@]}"; do
+      tar -xf /tmp/mashr_eqtl.tar -C "$MODEL_DIR" --strip-components=1 \
+        "eqtl/mashr/mashr_${tissue}.db" \
+        "eqtl/mashr/mashr_${tissue}.txt.gz" 2>/dev/null || true
+      # Rename to match our naming convention if needed
+      if [[ -f "${MODEL_DIR}/mashr_${tissue}.db" ]] && [[ ! -f "${MODEL_DIR}/gtex_v8_mashr_${tissue}.db" ]]; then
+        mv "${MODEL_DIR}/mashr_${tissue}.db" "${MODEL_DIR}/gtex_v8_mashr_${tissue}.db"
+        mv "${MODEL_DIR}/mashr_${tissue}.txt.gz" "${MODEL_DIR}/gtex_v8_mashr_${tissue}.txt.gz"
+      fi
+    done
+    rm -f /tmp/mashr_eqtl.tar
+    echo "  Models downloaded and extracted."
   else
-    echo "  Downloading ${tissue}.allpairs.txt.gz ..."
-    curl -L -o "$DEST" "${EQTL_BASE}/${tissue}.allpairs.txt.gz"
-    echo "  Done: $(du -h "$DEST" | cut -f1)"
+    echo "  All ${#TISSUES[@]} tissue models already present, skipping."
   fi
-done
 
-# ── 6. Verify liftover chain ────────────────────────────────
-echo ""
-CHAIN="data/reference/chains/hg19ToHg38.over.chain.gz"
-if [[ -f "$CHAIN" ]]; then
-  echo "Liftover chain file present."
+  # ── 5. Download GTEx v8 all-pairs eQTL files ────────────────
+  echo ""
+  echo "[5/5] Downloading GTEx v8 all-pairs eQTL files..."
+  echo "  NOTE: Each file is ~4GB. Total ~32GB for 8 tissues."
+  echo "  Downloads go to: data/reference/gtex_v8_eqtl/"
+  EQTL_DIR="data/reference/gtex_v8_eqtl"
+  mkdir -p "$EQTL_DIR"
+
+  for tissue in "${TISSUES[@]}"; do
+    DEST="${EQTL_DIR}/${tissue}.allpairs.txt.gz"
+    if [[ -f "$DEST" ]]; then
+      echo "  ${tissue}.allpairs.txt.gz already exists, skipping."
+    else
+      echo "  Downloading ${tissue}.allpairs.txt.gz ..."
+      curl -L -o "$DEST" "${EQTL_BASE}/${tissue}.allpairs.txt.gz"
+      echo "  Done: $(du -h "$DEST" | cut -f1)"
+    fi
+  done
+
+  # ── 6. Verify liftover chain ────────────────────────────────
+  echo ""
+  CHAIN="data/reference/chains/hg19ToHg38.over.chain.gz"
+  if [[ -f "$CHAIN" ]]; then
+    echo "Liftover chain file present."
+  else
+    echo "WARNING: Liftover chain missing at $CHAIN"
+    echo "  Download from: https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz"
+    mkdir -p "data/reference/chains"
+    curl -L -o "$CHAIN" "https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz"
+  fi
 else
-  echo "WARNING: Liftover chain missing at $CHAIN"
-  echo "  Download from: https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz"
-  mkdir -p "data/reference/chains"
-  curl -L -o "$CHAIN" "https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz"
+  echo "  Software-only mode: skipping GTEx models, eQTL downloads, and liftover chain."
+  echo "  Re-run with --with-data after the container is ready if you want to bootstrap reference assets."
 fi
 
 echo ""
 echo "============================================================"
 echo "Setup complete! Run the pipeline with:"
 echo "  python scripts/run_pipeline.py --no-mock 2>&1 | tee pipeline.log"
+if [[ "$DOWNLOAD_DATA" == false ]]; then
+  echo "Or, after adding data, re-run: bash scripts/setup_cloud.sh --with-data"
+fi
 echo "============================================================"
