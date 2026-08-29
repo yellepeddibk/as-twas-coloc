@@ -84,11 +84,30 @@ as-twas-coloc/
 │   │   ├── manuscript.tex        # LaTeX manuscript scaffold
 │   │   └── references.bib        # BibTeX reference database
 │   └── poster/
-│       └── poster_outline.md     # Poster scaffold for conferences
+│       ├── poster.tex            # Poster source (LaTeX beamerposter)
+│       ├── poster.pdf            # Compiled conference poster
+│       ├── poster.png            # Poster image preview
+│       ├── results_milestone1.md # Poster-ready milestone 1 results
+│       └── figures/              # Poster figures and diagrams
 └── .github/
     └── workflows/
         └── ci.yml                # GitHub Actions CI
 ```
+
+---
+
+## Poster Docs (`docs/poster`)
+
+The `docs/poster/` directory contains conference-poster assets and supporting files:
+
+- [`docs/poster/poster.tex`](docs/poster/poster.tex): main poster source file
+- [`docs/poster/poster.pdf`](docs/poster/poster.pdf): compiled poster
+- [`docs/poster/poster.png`](docs/poster/poster.png): quick visual preview
+- [`docs/poster/poster_outline.md`](docs/poster/poster_outline.md): planning outline
+- [`docs/poster/results_milestone1.md`](docs/poster/results_milestone1.md): milestone 1 result narrative and figure references
+- [`docs/poster/Makefile`](docs/poster/Makefile): build helpers for poster compilation
+
+Use Section 4 below to regenerate poster milestone outputs in `results/` before refreshing poster figures/content.
 
 ---
 
@@ -380,4 +399,3 @@ If this pipeline scaffold contributes to your research, please cite the underlyi
 - COLOC: Giambartolomei et al. (2014) *PLOS Genetics*; Wallace (2021) *PLOS Genetics*
 - GTEx v8: GTEx Consortium (2020) *Science*
 - AS GWAS: Ellinghaus et al. (2016) *Science* (or the specific GWAS used)
-
