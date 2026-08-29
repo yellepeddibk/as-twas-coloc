@@ -107,6 +107,10 @@ The `docs/poster/` directory contains conference-poster assets and supporting fi
 - [`docs/poster/results_milestone1.md`](docs/poster/results_milestone1.md): milestone 1 result narrative and figure references
 - [`docs/poster/Makefile`](docs/poster/Makefile): build helpers for poster compilation
 
+Poster preview (click to open the full PDF):
+
+[![AS TWAS-COLOC Poster Preview](docs/poster/poster_compressed.png)](docs/poster/poster.pdf)
+
 Use Section 4 below to regenerate poster milestone outputs in `results/` before refreshing poster figures/content.
 
 ---
