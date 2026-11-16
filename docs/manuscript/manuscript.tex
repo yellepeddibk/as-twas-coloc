@@ -115,9 +115,11 @@ variant.
 Bayesian colocalization using coloc.abf \citep{Giambartolomei2014} formally
 tests whether the GWAS signal and the eQTL signal at a given locus are driven
 by the same variant (posterior probability of hypothesis H4; PP4).
-High PP4 (typically $\geq 0.7$) provides strong evidence that the disease
-GWAS signal and the tissue-specific eQTL signal co-localize, supporting the
-gene as a causal driver of AS risk in that tissue.
+High PP4 (typically $\geq 0.7$) provides evidence that the disease GWAS
+signal and the tissue-specific eQTL signal share a causal variant under the
+single-causal-variant assumption of coloc.abf. This nominates the gene as a
+candidate mediator of AS risk in that tissue; colocalization alone does not
+establish that the gene is causal.
 
 Here, we describe a reproducible pipeline integrating GWAS summary statistics
 for AS with GTEx v8 S-PrediXcan TWAS followed by coloc-based prioritization,
@@ -135,9 +137,10 @@ should be reported directly from the source GWAS publication rather than
 inferred from downstream pipeline artifacts.
 
 We obtained AS GWAS summary statistics from the NHGRI-EBI GWAS Catalog
-accession GCST005529 \citep{Ellinghaus2016}. The dataset comprised 10,619
-cases and 15,145 controls (25,764 total samples). Summary statistics were
-originally reported on genome build hg19.
+accession GCST005529, which corresponds to the International Genetics of
+Ankylosing Spondylitis Consortium Immunochip study \citep{Cortes2013}. The
+dataset comprised 10,619 cases and 15,145 controls (25,764 total samples).
+Summary statistics were originally reported on genome build hg19.
 
 \subsection{GWAS Harmonization}
 

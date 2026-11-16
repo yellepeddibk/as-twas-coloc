@@ -17,7 +17,7 @@ This repository implements a modular, reproducible pipeline that:
 5. Reports additional coloc metrics: PP3+PP4 (locus power) and PP4/(PP3+PP4) (signal specificity)
 6. Saves provenance metadata, plots, and summary tables for manuscript integration
 
-**Important**: This repository runs in lightweight **mock/demo mode** by default. Real scientific execution requires downloading GTEx v8 reference data and installing external genomics tools (see [Prerequisites](#prerequisites)).
+**Important**: `scripts/run_pipeline.py` runs in lightweight **mock/demo mode** by default; pass `--no-mock` for real execution. Real scientific execution requires downloading GTEx v8 reference data and installing external genomics tools (see [Prerequisites](#prerequisites)). One real-mode run across the 8 configured tissues was completed (run ID `20260419T045215Z`). Its outputs are not committed to this repository; the TWAS and colocalization counts from that run are recorded in [config/publication_counts.json](config/publication_counts.json).
 
 ---
 
@@ -267,11 +267,10 @@ The following external resources are **NOT bundled** in this repository and must
 
 ### AS GWAS Summary Statistics
 
-Download from the GWAS Catalog or the original publication:
-- Recommended: [Ellinghaus et al. 2016](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5657534/) (IGAS meta-analysis)
-- Or: [International Genetics of AS Consortium (IGAS)](http://www.igas.org/)
-- GWAS Catalog accession: `GCST003452` or newer AS studies
-- Place in: `data/raw/as_gwas.tsv.gz`
+The configured dataset is GWAS Catalog accession `GCST005529`, the International Genetics of Ankylosing Spondylitis Consortium (IGAS) Immunochip study:
+- Cortes et al. (2013) *Nature Genetics* 45:730-738, [PMID 23749187](https://pubmed.ncbi.nlm.nih.gov/23749187/); 10,619 cases and 15,145 controls; hg19 coordinates
+- Download the summary statistics for `GCST005529` from the [GWAS Catalog](https://www.ebi.ac.uk/gwas/) (`setup_cloud.sh --with-data` does not fetch the GWAS file)
+- Place in: `data/raw/as_gwas_GCST005529.tsv.gz` (set by `gwas.input_file` in `config/as.yaml`)
 
 ### GTEx v8 PredictDB Models
 
@@ -324,7 +323,7 @@ Update `config/as.yaml` → `coloc.r_script` as needed.
 
 ## Harmonization Pitfalls
 
-1. **hg19 vs hg38 mismatch**: Most published AS GWAS use hg19. GTEx v8 uses hg38. A mismatch causes "0% of model SNPs found" in S-PrediXcan. The pipeline warns explicitly and calls a liftover placeholder.
+1. **hg19 vs hg38 mismatch**: Most published AS GWAS use hg19. GTEx v8 uses hg38. A mismatch causes "0% of model SNPs found" in S-PrediXcan. In real mode the pipeline lifts hg19 coordinates to hg38 with pyliftover (CrossMap is also supported); mock mode, or a missing chain file outside strict real mode, falls back to a passthrough.
 
 2. **GTEx varID vs rsID**: GTEx PredictDB models use `chr{chrom}_{pos}_{ref}_{alt}_b38` as the primary key, not rsID. The pipeline constructs varIDs from the harmonized positions.
 
@@ -383,9 +382,9 @@ The manuscript scaffold lives at `docs/manuscript/manuscript.tex`. Update the Re
 
 ## Limitations and TODOs
 
-- [ ] Implement real hg19→hg38 liftover (pyliftover or CrossMap)
-- [ ] Implement real eQTL regional data extraction from GTEx eQTL files
-- [ ] Implement real coloc.abf R execution with GTEx eQTL data
+- [x] Implement real hg19→hg38 liftover (pyliftover; CrossMap also supported)
+- [x] Implement real eQTL regional data extraction from GTEx eQTL files (`src/eqtl_regions.py`, `scripts/build_eqtl_regions_for_coloc.py`)
+- [x] Implement real coloc.abf R execution with GTEx eQTL data
 - [ ] Implement coloc.susie for multi-causal loci (after initial coloc.abf screen)
 - [ ] Implement FINEMAP for top priority loci
 - [ ] Validate varID construction against hg38 reference FASTA
@@ -402,4 +401,4 @@ If this pipeline scaffold contributes to your research, please cite the underlyi
 - S-PrediXcan: Barbeira et al. (2018) *Nature Communications*
 - COLOC: Giambartolomei et al. (2014) *PLOS Genetics*; Wallace (2021) *PLOS Genetics*
 - GTEx v8: GTEx Consortium (2020) *Science*
-- AS GWAS: Ellinghaus et al. (2016) *Science* (or the specific GWAS used)
+- AS GWAS: International Genetics of Ankylosing Spondylitis Consortium, Cortes et al. (2013) *Nature Genetics* (GWAS Catalog `GCST005529`)

@@ -34,7 +34,7 @@
 
 Pipeline (5 stages):
 1. GWAS QC and Harmonization: AS GWAS GCST005529 (N=25,764), liftOver hg38, palindromic SNP removal
-2. S-PrediXcan TWAS: GTEx v8 Mashr models, 8 tissues, 2,316 gene-tissue tests
+2. S-PrediXcan TWAS: GTEx v8 Mashr models, 8 tissues, 2,313 valid gene-tissue tests (2,316 raw rows; 3 had missing p-values)
 3. FDR Correction: Benjamini-Hochberg, alpha=0.05
 4. Bayesian Colocalization: coloc.abf, PP4 >= 0.70 threshold
 5. Prioritized gene list output
@@ -47,7 +47,7 @@ Pipeline (5 stages):
 
 ## 3. TWAS Results (Column 2)
 
-- 2,316 gene-tissue pairs tested across 8 GTEx v8 tissues
+- 2,313 valid gene-tissue tests across 8 GTEx v8 tissues (2,316 raw S-PrediXcan rows; 3 had missing p-values)
 - 248 significant associations after BH-FDR correction (alpha=0.05)
 - Strong departure from null in QQ-plot, consistent with polygenic architecture
 
