@@ -23,10 +23,10 @@
 - AS: chronic inflammatory arthritis of spine/sacroiliac joints, 0.1-0.5% prevalence
 - Strong genetic component (h^2 ~70-90%), HLA-B*27 as major risk factor
 - GWAS identified >100 risk loci, but most are non-coding
-- TWAS integrates GWAS with gene expression models to identify causal genes
+- TWAS integrates GWAS with gene expression models to identify candidate genes
 - Colocalization distinguishes shared causal signals from LD artifacts
 
-**Key question**: Which genes have genetically regulated expression that causally colocalizes with AS risk variants, and in which tissues?
+**Key question**: Which genes have genetically regulated expression that colocalizes with AS risk variants, and in which tissues?
 
 ---
 
@@ -39,7 +39,7 @@ Pipeline (5 stages):
 4. Bayesian Colocalization: coloc.abf, PP4 >= 0.70 threshold
 5. Prioritized gene list output
 
-**GWAS QC numbers**: 123,941 input SNPs -> 123,925 lifted -> 14,032 palindromic removed -> 109,893 harmonized
+**GWAS QC numbers**: 123,941 input SNPs -> 123,896 lifted -> 14,031 palindromic removed -> 109,865 harmonized
 
 **8 Tissues**: Whole Blood, Spleen, Lung, Colon Sigmoid, Colon Transverse, Small Intestine, Muscle Skeletal, Adipose Subcutaneous
 
@@ -59,7 +59,7 @@ Pipeline (5 stages):
 
 - 248 TWAS hits tested with coloc.abf
 - **35 gene-tissue pairs (18 unique genes)** with PP4 >= 0.70
-- Confirms shared causal variant between GWAS and eQTL
+- Supports a shared causal variant between GWAS and eQTL (PP4 >= 0.70, single-causal-variant assumption)
 
 **Top colocalized genes** (by PP4):
 
@@ -82,17 +82,18 @@ Pipeline (5 stages):
 
 ## 5. Discussion (Column 3)
 
-- ERAP1 (aminopeptidase, MHC-I antigen processing) validates pipeline as established AS gene
-- ERAP1 colocalizes in both Whole Blood and Small Intestine, highlighting tissue-specific regulation
-- Novel candidates: GPR25, CCDC116, NPIPB7 warrant experimental follow-up
+- ERAP1 (aminopeptidase, MHC-I antigen processing) is an established AS gene, consistent with the pipeline recovering known biology
+- ERAP1 colocalizes in both Whole Blood and Small Intestine
+- Less-characterized candidates: GPR25, CCDC116, NPIPB7 warrant replication and functional follow-up
 - CARD9 and FAS implicate innate immune and apoptotic pathways beyond HLA-B27
-- Colocalization reduced 248 TWAS hits to 35 confirmed pairs, filtering LD-driven false positives
+- Colocalization narrowed 248 TWAS hits to 35 supported pairs; most other hits were underpowered (PP3+PP4 < 0.8) rather than refuted
+- Immunochip coverage limits the TWAS: most gene models were tested with a single SNP
 
 ---
 
 ## 6. Conclusion (Column 3)
 
-Integrating S-PrediXcan TWAS with Bayesian colocalization across 8 tissues identified 18 unique genes with strong evidence of shared causal variants with AS risk loci. This two-stage approach provides a principled filter against LD contamination and prioritizes tissue-specific regulatory targets for therapeutic development.
+Integrating S-PrediXcan TWAS with Bayesian colocalization across 8 tissues identified 18 unique genes with evidence of shared causal variants at AS risk loci. This two-stage approach narrows TWAS signals to a smaller set of higher-confidence candidates for fine-mapping and functional follow-up.
 
 ---
 

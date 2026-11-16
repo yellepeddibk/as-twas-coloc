@@ -2,9 +2,9 @@
   "_description": "Frozen publication counts derived from the real TWAS + COLOC run. The validator script compares live artifacts against these values to prevent silent drift.",
   "gwas_harmonization": {
     "input_snp_count": 123941,
-    "lifted_snp_count": 123925,
-    "palindromic_dropped_count": 14032,
-    "final_retained_snp_count": 109893
+    "lifted_snp_count": 123896,
+    "palindromic_dropped_count": 14031,
+    "final_retained_snp_count": 109865
   },
   "twas": {
     "raw_gene_tissue_rows": 2316,
