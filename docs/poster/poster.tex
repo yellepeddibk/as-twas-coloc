@@ -66,8 +66,8 @@ regulatory mechanisms from LD-driven associations.
 % ── Key Question ─────────────────────────────────────────────────────────────
 \begin{alertblock}{Key Question}
 \centering\large
-Which genes have genetically regulated expression that \textbf{causally
-colocalizes} with AS risk variants, and in which tissues?
+Which genes have genetically regulated expression that
+\textbf{colocalizes} with AS risk variants, and in which tissues?
 \end{alertblock}
 
 % ── Methods ──────────────────────────────────────────────────────────────────
@@ -105,8 +105,8 @@ colocalizes} with AS risk variants, and in which tissues?
 \end{tikzpicture}
 \end{center}
 
-\textbf{GWAS QC:} 123,941 SNPs $\to$ liftOver hg38 $\to$ 14,032
-palindromic removed $\to$ 109,893 harmonized.
+\textbf{GWAS QC:} 123,941 SNPs $\to$ liftOver hg38 $\to$ 14,031
+palindromic removed $\to$ 109,865 harmonized.
 
 \vskip0.2em
 \textbf{Tissues:} Whole Blood, Spleen, Lung, Colon Sigmoid, Colon
@@ -117,18 +117,18 @@ Transverse, Small Intestine, Muscle Skeletal, Adipose Subcutaneous.
 \begin{block}{Discussion}
 \justifying
 \begin{itemize}\setlength{\itemsep}{2pt}
-  \item \textit{ERAP1} (MHC-I antigen processing) is a known AS gene,
-    validating our pipeline, and colocalizes in Whole Blood and Small Intestine.
-  \item Novel candidates \textit{GPR25}, \textit{CCDC116}, \textit{NPIPB7}
-    warrant experimental follow-up as tissue-specific drug targets.
+  \item \textit{ERAP1} (MHC-I antigen processing), a known AS gene,
+    colocalizes in Whole Blood and Small Intestine.
+  \item Less-characterized candidates \textit{GPR25}, \textit{CCDC116},
+    \textit{NPIPB7} warrant replication and functional follow-up.
   \item \textit{CARD9} and \textit{FAS} implicate innate immune and
     apoptotic pathways beyond HLA-B27.
-  \item Colocalization reduced 248 TWAS hits to 35 confirmed pairs,
-    filtering LD-driven false positives.
-  \item \textit{UBE2L3} (ubiquitin-proteasome pathway) may interact with
-    \textit{ERAP1} in antigen processing, suggesting a shared mechanistic axis.
-  \item Whole Blood was the most frequently enriched tissue (11 of 35 pairs),
-    consistent with AS being a systemic immune-mediated disease.
+  \item Colocalization narrowed 248 TWAS hits to 35 supported pairs;
+    most other hits were underpowered rather than refuted.
+  \item Immunochip coverage limits the TWAS: most gene models used a
+    single SNP.
+  \item Whole Blood contributed the most pairs (11 of 35), but also had
+    the most tests.
 \end{itemize}
 \end{block}
 
@@ -165,8 +165,8 @@ tissues. Top gene symbols annotated. Dashed line: FDR $< 0.05$.}
 \end{center}
 \begin{center}
 \includegraphics[width=0.46\linewidth]{figures/qqplot_twas.png}
-\captionof{figure}{QQ-plot: departure from null consistent with
-polygenic architecture. Grey band: 95\% CI.}
+\captionof{figure}{QQ-plot: departure from null reflects immune-targeted
+Immunochip loci and the MHC. Grey band: 95\% CI.}
 \end{center}
 \end{block}
 
@@ -175,13 +175,13 @@ polygenic architecture. Grey band: 95\% CI.}
 \justifying
 Of the 248 TWAS hits, Bayesian colocalization (coloc.abf) identified
 \textbf{35 gene-tissue pairs (18 unique genes)} with PP4 $\geq$ 0.70,
-confirming a shared causal variant between GWAS and eQTL signals.
+supporting a shared causal variant between GWAS and eQTL signals.
 
 \vskip0.3em
 \begin{center}
 \includegraphics[width=0.54\linewidth]{figures/coloc_pp4_vs_pp3pp4.png}
-\captionof{figure}{PP4 vs.\ locus power (PP3+PP4). Upper-right:
-colocalization-confirmed hits.}
+\captionof{figure}{PP4 vs.\ locus power (PP3+PP4). Colored: PP4 $\geq$ 0.70
+hits (34 of 35 also have PP3+PP4 $\geq$ 0.80).}
 \end{center}
 \end{block}
 
@@ -189,8 +189,8 @@ colocalization-confirmed hits.}
 \begin{block}{Conclusion}
 \justifying
 Integrating S-PrediXcan TWAS with Bayesian colocalization identified
-\textbf{18 unique genes} with shared causal variants at AS risk loci,
-prioritizing tissue-specific targets for therapeutic development.
+\textbf{18 unique genes} with evidence of shared causal variants at AS
+risk loci, prioritizing candidates for follow-up studies.
 
 \vskip0.3em
 This framework improves interpretability by narrowing a broad set of TWAS
@@ -219,7 +219,7 @@ validation in AS.
 \begin{block}{Top Colocalized Genes}
 \begin{center}
 \hspace*{-6.5cm}\includegraphics[width=0.78\linewidth,keepaspectratio]{figures/coloc_pp4_barplot.png}
-\captionof{figure}{All 35 coloc-confirmed gene-tissue pairs ranked by PP4.
+\captionof{figure}{All 35 colocalized gene-tissue pairs ranked by PP4.
 Color indicates tissue. Dashed line: PP4 = 0.70.}
 \end{center}
 
@@ -245,7 +245,7 @@ Color indicates tissue. Dashed line: PP4 = 0.70.}
 \begin{block}{Selected References}
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{0pt}\setlength{\leftskip}{-1.2em}
   \item Ma X, Dey S, et al. Seq2Bind webserver. \textit{NAR Genom Bioinform}. 2025;7:lqaf154.
-  \item Ellinghaus D, et al. Multi-disease inflammatory GWAS meta-analysis. \textit{Nat Genet}. 2016;48:510--518.
+  \item Cortes A, et al. AS risk variants via Immunochip genotyping. \textit{Nat Genet}. 2013;45:730--738.
   \item GTEx Consortium. Regulatory effects across human tissues (GTEx atlas). \textit{Science}. 2020;369:1318--1330.
   \item Barbeira AN, et al. S-PrediXcan. \textit{Nat Commun}. 2018;9:1825.
   \item Giambartolomei C, et al. coloc.abf. \textit{PLoS Genet}. 2014;10:e1004383.
@@ -258,7 +258,7 @@ Color indicates tissue. Dashed line: PP4 = 0.70.}
 \justifying
 We thank \textbf{Dr.\ Ratul Chowdhury} for mentorship and project guidance.
 AS GWAS summary statistics were obtained from the NHGRI-EBI GWAS Catalog
-(GCST005529; Ellinghaus et al.\ 2016), with expression models from GTEx v8.
+(GCST005529; Cortes et al.\ 2013), with expression models from GTEx v8.
 Analyses used S-PrediXcan, coloc.abf, and STRING-DB v12 in Python and R.
 
 \vskip0.2em
